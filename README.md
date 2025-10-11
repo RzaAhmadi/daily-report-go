@@ -1,215 +1,271 @@
-برنامه وب رویدادها با Go
-یک برنامه وب جامع برای مدیریت گزارش‌های روزانه، شیفت‌های کاری و پیگیری رویدادها که با بک‌اند Go و فرانت‌اند HTML/CSS/JavaScript مدرن ساخته شده است.
+# Go Event Web Application
 
-فهرست مطالب
-ویژگی‌ها
-تکنولوژی‌های استفاده‌شده
-ساختار پروژه
-نصب
-پیکربندی
-راه‌اندازی پایگاه داده
-اجرای برنامه
-انتشارات API
-صفحات فرانت‌اند
-پنل ادمین
-توسعه
-استقرار
-همکاری Open Source
-مجوز
-ویژگی‌ها
-احراز هویت کاربری: سیستم ورود/خروج امن با کنترل دسترسی مبتنی بر نقش
-مدیریت گزارش روزانه: ایجاد، مشاهده، ویرایش و حذف گزارش‌های روزانه
-مدیریت شیفت‌ها: تعریف و مدیریت برنامه‌های شیفت
-پیگیری رویدادها: پیگیری رویدادهای مختلف با اطلاعات دقیق
-بررسی سلامت سیستم: پایش پارامترهای سلامت سامانه
-RCA (تحلیل علت اصلی): مستندسازی تحلیل علت اصلی رویدادهای حیاتی
-پنل ادمین: رابط کاربری جامع برای مدیریت کاربران، شیفت‌ها و عناوین رویداد
-طراحی واکنش‌گرا: رابط کاربری سازگار با موبایل و دستگاه‌های مختلف
-تصویرسازی داده‌ها: داشبورد گزارش‌ها با آمار و بینش‌های مهم
-تکنولوژی‌های استفاده‌شده
-بک‌اند
-Go (Golang): زبان اصلی برنامه‌نویسی
-SQLite: پایگاه داده برای ذخیره داده‌ها
-Gorilla Mux: مولتی‌پلکسر درخواست‌های HTTP
-JWT: احراز هویت و مجوزدهی
-فرانت‌اند
-HTML5: زبان نشانه‌گذاری
-CSS3/Tailwind CSS: سبک‌دهی و طراحی واکنش‌گرا
-JavaScript (ES6+): عملکرد سمت کاربر
-Font Awesome: آیکن‌ها
-Fetch API: درخواست‌های AJAX
-ابزارهای توسعه
-Go Modules: مدیریت وابستگی‌ها
-Air: بارگذاری مجدد زنده برای برنامه‌های Go
-ساختار پروژه
-csharp
+A comprehensive web application for managing daily reports, shift schedules, and event tracking built with Go backend and modern HTML/CSS/JavaScript frontend.
+
+## Table of Contents
+
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Database Setup](#database-setup)
+- [Running the Application](#running-the-application)
+- [API Endpoints](#api-endpoints)
+- [Frontend Pages](#frontend-pages)
+- [Admin Panel](#admin-panel)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **User Authentication**: Secure login/logout system with role-based access control
+- **Daily Report Management**: Create, view, edit, and delete daily reports
+- **Shift Management**: Define and manage shift schedules
+- **Event Tracking**: Track various events with detailed information
+- **Health Checks**: Monitor system health parameters
+- **RCA (Root Cause Analysis)**: Document root cause analysis for critical events
+- **Admin Panel**: Comprehensive administration interface for managing users, shifts, and event titles
+- **Responsive Design**: Mobile-friendly interface that works on all devices
+- **Data Visualization**: Reports dashboard with statistics and insights
+
+## Technologies Used
+
+### Backend
+- **Go (Golang)**: Main programming language
+- **SQLite**: Database for data storage
+- **Gorilla Mux**: HTTP request multiplexer
+- **JWT**: Authentication and authorization
+
+### Frontend
+- **HTML5**: Markup language
+- **CSS3/Tailwind CSS**: Styling and responsive design
+- **JavaScript (ES6+)**: Client-side functionality
+- **Font Awesome**: Icons
+- **Fetch API**: AJAX requests
+
+### Development Tools
+- **Go Modules**: Dependency management
+- **Air**: Live reloading for Go applications
+
+## Project Structure
+
+```
 Go-event-web-22/
-├── main.go                 # نقطه ورودی اصلی برنامه
-├── database.html           # مقداردهی و مدیریت پایگاه داده
-├── go.mod                  # وابستگی‌های ماژول Go
-├── go.sum                  # چک‌سام‌های ماژول Go
-├── README.md               # مستندات پروژه
-├── static/                 # دارایی‌های ثابت
-│   ├── admin.html          # رابط پنل ادمین
-│   ├── login.html          # صفحه ورود کاربر
-│   ├── report-form.html    # فرم ایجاد/ویرایش گزارش روزانه
-│   ├── reports-list.html   # فهرست گزارش‌ها و مشاهده آن‌ها
-│   ├── 200.png             # لوگوی شرکت
-│   └── ...                 # سایر دارایی‌های ثابت
-└── ...                     # سایر فایل‌های پروژه
-نصب
-پیش‌نیازها:
+├── main.go                 # Main application entry point
+├── database.html           # Database initialization and management
+├── go.mod                  # Go module dependencies
+├── go.sum                  # Go module checksums
+├── README.md               # Project documentation
+├── static/                 # Static assets directory
+│   ├── admin.html          # Admin panel interface
+│   ├── login.html          # User login page
+│   ├── report-form.html    # Daily report creation/editing form
+│   ├── reports-list.html   # Reports listing and viewing
+│   ├── 200.png             # Company logo
+│   └── ...                 # Other static assets
+└── ...                     # Other project files
+```
 
-Go 1.16 یا بالاتر
-Git
-کلون کردن مخزن:
+## Installation
 
-bash
-git clone <repository-url>
-cd Go-event-web-22
-نصب وابستگی‌ها:
+1. **Prerequisites**:
+   - Go 1.16 or higher
+   - Git
 
-bash
-go mod tidy
-پیکربندی
-اپلیکیشن از متغیرهای محیطی برای پیکربندی استفاده می‌کند. در ریشه پروژه یک فایل .env ایجاد کنید:
+2. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd Go-event-web-22
+   ```
 
-env
-# پیکربندی سرور
+3. **Install dependencies**:
+   ```bash
+   go mod tidy
+   ```
+
+## Configuration
+
+The application uses environment variables for configuration. Create a `.env` file in the project root:
+
+```env
+# Server configuration
 PORT=8080
 HOST=localhost
 
-# پیکربندی پایگاه داده
+# Database configuration
 DB_PATH=./data.db
 
-# پیکربندی JWT
+# JWT configuration
 JWT_SECRET=your-secret-key-here
 JWT_EXPIRATION=24h
-راه‌اندازی پایگاه داده
-اپلیکیشن از SQLite برای ذخیره داده‌ها استفاده می‌کند. پایگاه داده به‌طور خودکار در هنگام بوت شدن برنامه راه‌اندازی می‌شود:
+```
 
+## Database Setup
 
-اجرای برنامه
-حالت توسعه
-bash
-# اجرا مستقیم
+The application uses SQLite for data storage. The database is automatically initialized when the application starts:
+
+1. On first run, the application will create a SQLite database file
+2. Tables for users, shifts, reports, events, and other entities will be created automatically
+3. Default admin user will be created with username `admin` and password ``
+
+## Running the Application
+
+### Development Mode
+
+```bash
+# Run directly
 go run main.go
 
-# یا با بارگذاری زنده (اگر ابزار air نصب باشد)
+# Or with live reload (if air is installed)
 air
-حالت تولید
-bash
-# ساخت برنامه
+```
+
+### Production Mode
+
+```bash
+# Build the application
 go build -o go-event-web main.go
 
-# اجرای باینری ساخته‌شده
+# Run the built binary
 ./go-event-web
-اپلیکیشن در آدرس http://localhost:8080 در دسترس خواهد بود.
+```
 
-Endpoints API
-احراز هویت
-POST /api/login - ورود کاربر
-POST /api/logout - خروج کاربر
-GET /api/check-auth - بررسی وضعیت احراز هویت
-کاربران
-GET /api/users - دریافت تمامی کاربران
-POST /api/users - ایجاد کاربر جدید
-PUT /api/users/{id} - به‌روزرسانی کاربر
-DELETE /api/users/{id} - حذف کاربر
-ساعات شیفت
-GET /api/shift-hours - دریافت تمامی ساعات شیفت
-POST /api/shift-hours - ایجاد شیفت جدید
-PUT /api/shift-hours/{id} - به‌روزرسانی شیفت
-DELETE /api/shift-hours/{id} - حذف شیفت
-عناوین رویداد
-GET /api/event-titles - دریافت تمام عناوین رویداد
-POST /api/event-titles - ایجاد عنوان رویداد جدید
-PUT /api/event-titles/{id} - به‌روزرسانی عنوان رویداد
-DELETE /api/event-titles/{id} - حذف عنوان رویداد
-گزارش‌ها
-GET /api/reports - دریافت تمام گزارش‌ها
-GET /api/reports/{id} - دریافت گزارش مشخص
-POST /api/reports - ایجاد گزارش جدید
-PUT /api/reports/{id} - به‌روزرسانی گزارش
-DELETE /api/reports/{id} - حذف گزارش
-صفحات فرانت‌اند
-صفحات عمومی
-/static/login.html - صفحه ورود کاربر
-/ - صفحه اصلی (در صورت نبود احراز هویت به صفحه ورود هدایت می‌شود)
-صفحات کاربری
-/static/report-form.html - ایجاد/ویرایش گزارش‌های روزانه
-/static/reports-list.html - مشاهده همه گزارش‌ها با گزینه‌های فیلتر
-صفحات ادمین
-/static/admin.html - پنل مدیریتی برای مدیریت:
-کاربران
-برنامه‌های شیفت
-عناوین رویداد
-گزارش‌های سیستم و آمار
-پنل ادمین
-پنل ادمین قابلیت‌های مدیریتی جامعی را ارائه می‌دهد:
+The application will be available at `http://localhost:8080`
 
-مدیریت کاربران
-افزودن، ویرایش و حذف کاربران
-اختصاص نقش‌ها (ادمین/کاربر)
-مشاهده جزئیات کاربر
-مدیریت شیفت‌ها
-تعریف برنامه‌های شیفت با زمان‌های شروع/پایان
-مدیریت نام‌ها و توضیحات شیفت
-مدیریت عناوین رویداد
-ایجاد و مدیریت دسته‌بندی رویداد
-حفظ نام‌گذاری منسجم رویدادها
-نمایه گزارش‌ها
-مشاهده آمار سیستم
-نظارت بر ارائه گزارش‌ها
-دسترسی به داده‌های سلامت
-برای دسترسی به پنل ادمین:
+## API Endpoints
 
-با حسابی دارای امتیازات مدیر وارد شوید
-روی لینک "Admin" در نوار ناوبری کلیک کنید
-توسعه
-ساختار کد
-ساختار اصلی برنامه به صورت زیر است:
+### Authentication
+- `POST /api/login` - User login
+- `POST /api/logout` - User logout
+- `GET /api/check-auth` - Check authentication status
 
-main.go - شامل همه‌ی هندلرهای HTTP و منطق برنامه
-database.html - مقداردهی پایگاه داده و توابع کمکی
-فایل‌های فرانت‌اند در دایرکتوری static/ مدیریت می‌شوند
-افزودن ویژگی‌های جدید
-اضافه کردنEndpointهای API جدید در main.go
-افزودن قابلیت‌های فرانت‌اند مرتبط در فایل HTML مربوطه
-به‌روزرسانی این README برای مستندسازی ویژگی‌های جدید
-طرح پایگاه داده
-این برنامه از جداول زیر استفاده می‌کند:
+### Users
+- `GET /api/users` - Get all users
+- `POST /api/users` - Create new user
+- `PUT /api/users/{id}` - Update user
+- `DELETE /api/users/{id}` - Delete user
 
-users - حساب‌های کاربری و احراز هویت
-shift_hours - تعریف‌های شیفت
-event_titles - تعریف‌های دسته‌بندی رویداد
-reports - گزارش‌های روزانه
-report_shift_managers - رابطه چندبه‌چند بین گزارش‌ها و کاربران
-report_event_titles - رابطه چندبه‌چند بین گزارش‌ها و عناوین رویداد
-report_events_part3 - رویدادهایی که نیاز به RCA دارند
-report_events_part4 - رویدادهایی که نیاز به RCA ندارند
-استقرار
-الزامات سرور
-محیط اجرای Go
-مجوز نوشتن در دایرکتوری برنامه
-در دسترس بودن پورت 8080 (یا پورتی که پیکربندی شده است)
-مراحل استقرار
-ساخت برنامه:
+### Shift Hours
+- `GET /api/shift-hours` - Get all shift hours
+- `POST /api/shift-hours` - Create new shift
+- `PUT /api/shift-hours/{id}` - Update shift
+- `DELETE /api/shift-hours/{id}` - Delete shift
 
-bash
-go build -o go-event-web main.go
-کپی باینری و فایل‌های ثابت به سرور
+### Event Titles
+- `GET /api/event-titles` - Get all event titles
+- `POST /api/event-titles` - Create new event title
+- `PUT /api/event-titles/{id}` - Update event title
+- `DELETE /api/event-titles/{id}` - Delete event title
 
-تنظیم متغیرهای محیطی به‌دلخواه
+### Reports
+- `GET /api/reports` - Get all reports
+- `GET /api/reports/{id}` - Get specific report
+- `POST /api/reports` - Create new report
+- `PUT /api/reports/{id}` - Update report
+- `DELETE /api/reports/{id}` - Delete report
 
-اجرای برنامه:
+## Frontend Pages
 
-bash
-./go-event-web
-پروکسی معکوس (Nginx)
-نمونه پیکربندی Nginx:
+### Public Pages
+- `/static/login.html` - User login page
+- `/` - Home page (redirects to login if not authenticated)
 
-nginx
+### User Pages
+- `/static/report-form.html` - Create/edit daily reports
+- `/static/reports-list.html` - View all reports with filtering options
+
+### Admin Pages
+- `/static/admin.html` - Administrative panel for managing:
+  - Users
+  - Shift schedules
+  - Event titles
+  - System reports and statistics
+
+## Admin Panel
+
+The admin panel provides comprehensive management capabilities:
+
+### Users Management
+- Add, edit, and delete users
+- Assign roles (admin/user)
+- View user details
+
+### Shifts Management
+- Define shift schedules with start/end times
+- Manage shift names and descriptions
+
+### Event Titles Management
+- Create and manage event categories
+- Maintain consistent event naming
+
+### Reports Overview
+- View system statistics
+- Monitor report submissions
+- Access health check data
+
+To access the admin panel:
+1. Login with an account that has admin privileges
+2. Click the "Admin" link in the navigation bar
+
+## Development
+
+### Code Structure
+
+The main application is structured as follows:
+
+- `main.go` - Contains all HTTP handlers and application logic
+- `database.html` - Database initialization and helper functions
+- Static files in `static/` directory handle the frontend
+
+### Adding New Features
+
+1. Create new API endpoints in `main.go`
+2. Add corresponding frontend functionality in the appropriate HTML file
+3. Update this README to document new features
+
+### Database Schema
+
+The application uses the following tables:
+- `users` - User accounts and authentication
+- `shift_hours` - Shift schedule definitions
+- `event_titles` - Event category definitions
+- `reports` - Daily reports
+- `report_shift_managers` - Many-to-many relationship between reports and users
+- `report_event_titles` - Many-to-many relationship between reports and event titles
+- `report_events_part3` - Events requiring RCA
+- `report_events_part4` - Events not requiring RCA
+
+## Deployment
+
+### Server Requirements
+- Go runtime environment
+- Write permissions for the application directory
+- Port 8080 available (or configured port)
+
+### Deployment Steps
+
+1. Build the application:
+   ```bash
+   go build -o go-event-web main.go
+   ```
+
+2. Copy the binary and static files to the server
+
+3. Set environment variables as needed
+
+4. Run the application:
+   ```bash
+   ./go-event-web
+   ```
+
+### Reverse Proxy (Nginx)
+
+Example Nginx configuration:
+
+```nginx
 server {
     listen 80;
     server_name your-domain.com;
@@ -220,11 +276,20 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
     }
 }
-همکاری و مشارکت
-مخزن را فِرِک کنید
-شاخه ویژگی ایجاد کنید (git checkout -b feature/AmazingFeature)
-تغییرات را کامیت کنید (git commit -m 'Add some AmazingFeature')
-به شاخه پوش کنید (git push origin feature/AmazingFeature)
-درخواست ادغام (Pull Request) ایجاد کنید
+```
 
-توجه: این برنامه برای استفاده داخلی طراحی شده است و باید در محیطی ایمن استقرار یابد. همواره از رمزهای قوی استفاده کنید و کلید JWT را در محیط‌های تولید امن نگه دارید.
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Note**: This application is designed for internal use and should be deployed in a secure environment. Always use strong passwords and keep the JWT secret secure in production environments.
