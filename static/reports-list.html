@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports List - Daily Report System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        @keyframes slideInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(50px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+            }
+            70% { 
+                box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-slide-up {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-pulse-ring {
+            animation: pulse 2s infinite;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+        
+        .report-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .report-card:hover::before {
+            left: 100%;
+        }
+        
+        .status-badge {
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-with-rca {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+        }
+        
+        .status-without-rca {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+        }
+        
+        .status-health-check {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .filter-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .filter-button.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+        
+        .filter-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        
+        .filter-button:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+        
+        .detail-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .detail-section:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08));
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .detail-label {
+            color: #a78bfa;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .detail-content {
+            color: #e5e7eb;
+            line-height: 1.7;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+        }
+        
+        .action-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .action-button:hover::before {
+            left: 100%;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #8b5cf6;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen custom-scrollbar">
+    <!-- Navigation Header -->
+    <nav class="glass-effect sticky top-0 z-40 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-4">
+                                       <a href="/" target="_blank" rel="noopener noreferrer">
+  <img src="200.png" alt="لوگوی شرکت" width="100" height="auto">
+</a>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">Reports Dashboard</h1>
+                        <p class="text-purple-200 text-sm font-medium">Daily Report Management System</p>
+                    </div>
+                </div>
+                
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <!-- User Info -->
+                    <div class="glass-effect px-4 py-2 rounded-xl">
+                        <span id="userInfo" class="text-white font-semibold flex items-center">
+                            <i class="fas fa-user-circle mr-2 text-lg"></i>
+                            <span>Loading...</span>
+                        </span>
+                    </div>
+                    
+                    <!-- New Report Button -->
+                    <a href="/static/report-form.html" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-plus"></i>
+                        <span>New Report</span>
+                    </a>
+                    
+                    <!-- Admin Panel (Hidden by default) -->
+                    <a href="/static/admin.html" id="adminPanelLink" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 hidden">
+                        <i class="fas fa-cogs"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                    
+                    <!-- Logout Button -->
+                    <button onclick="logout()" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Page Header -->
+        <div class="text-center mb-12 animate-fade-in">
+            <h2 class="text-5xl font-bold text-white mb-4 animate-float">
+                <span class="gradient-text">All Reports</span>
+            </h2>
+            <p class="text-xl text-purple-200 font-medium">Comprehensive view of all daily reports with advanced filtering</p>
+        </div>
+
+        <!-- Search and Filters Section -->
+        <div class="glass-effect rounded-3xl p-8 mb-8 animate-slide-up shadow-2xl">
+            <!-- Search Bar -->
+            <div class="mb-6">
+                <div class="relative max-w-2xl mx-auto">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="🔍 Search reports by title, description, RCA, user name, or ID..." 
+                        class="search-input w-full px-6 py-4 pl-14 rounded-2xl text-white placeholder-gray-300 focus:outline-none text-lg font-medium"
+                    >
+                    <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-300 text-xl"></i>
+                    <div id="searchClearBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-white transition-colors hidden">
+                        <i class="fas fa-times text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Row -->
+            <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+                <!-- Date Range Filters -->
+                <div class="flex items-center space-x-4 bg-white/5 p-4 rounded-2xl">
+                    <label class="text-white font-semibold text-sm uppercase tracking-wide">
+                        <i class="fas fa-calendar-alt mr-2"></i>Date Range:
+                    </label>
+                    <input 
+                        type="date" 
+                        id="startDate" 
+                        class="search-input px-4 py-2 rounded-xl text-white focus:outline-none"
+                    >
+                    <span class="text-white font-medium">to</span>
+                    <input 
+                        type="date" 
+                        id="endDate" 
+                        class="search-input px-4 py-2 rounded-xl text-white focus:outline-none"
+                    >
+                    <button 
+                        onclick="clearDateFilter()" 
+                        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl transition-all duration-300 flex items-center space-x-2"
+                        title="Clear Date Filter"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Status Filter Buttons -->
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="filterReports('all')" class="filter-button active px-6 py-3 glass-effect rounded-xl text-white font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-list"></i>
+                        <span>All Reports</span>
+                    </button>
+                    <button onclick="filterReports('with_rca')" class="filter-button px-6 py-3 glass-effect rounded-xl text-white font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>With RCA</span>
+                    </button>
+                    <button onclick="filterReports('without_rca')" class="filter-button px-6 py-3 glass-effect rounded-xl text-white font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Without RCA</span>
+                    </button>
+                    <button onclick="filterReports('health_check')" class="filter-button px-6 py-3 glass-effect rounded-xl text-white font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Health Check</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Count and Actions -->
+        <div class="flex justify-between items-center mb-8 animate-fade-in">
+            <div class="glass-effect px-6 py-4 rounded-2xl">
+                <span class="text-white font-bold text-lg">
+                    <i class="fas fa-file-alt mr-3 text-blue-400"></i>
+                    Showing <span id="reportsCount" class="text-blue-300 text-xl">0</span> reports
+                    <span id="totalReportsCount" class="text-gray-300"></span>
+                </span>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button onclick="refreshReports()" class="glass-effect hover:glass-hover px-6 py-3 rounded-xl text-white font-semibold transition-all duration-300 flex items-center space-x-2">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Refresh</span>
+                </button>
+                <button onclick="clearAllFilters()" class="glass-effect hover:glass-hover px-6 py-3 rounded-xl text-white font-semibold transition-all duration-300 flex items-center space-x-2">
+                    <i class="fas fa-filter"></i>
+                    <span>Clear Filters</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Reports Container -->
+        <div id="reportsContainer" class="space-y-8">
+            <!-- Reports will be dynamically loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingSpinner" class="text-center py-20">
+            <div class="loading-spinner mx-auto mb-6"></div>
+            <h3 class="text-2xl font-bold text-white mb-2">Loading Reports...</h3>
+            <p class="text-purple-200">Please wait while we fetch your reports</p>
+        </div>
+
+        <!-- No Reports State -->
+        <div id="noReportsMessage" class="text-center py-20 hidden">
+            <div class="glass-effect rounded-3xl p-12 max-w-lg mx-auto">
+                <div class="text-8xl mb-6">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-white mb-4">No Reports Found</h3>
+                <p class="text-gray-300 text-lg mb-8">No reports match your current search criteria. Try adjusting your filters or search terms.</p>
+                <button onclick="clearAllFilters()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center space-x-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <i class="fas fa-refresh"></i>
+                    <span>Clear All Filters</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-6 right-6 z-50 space-y-4 max-w-sm">
+        <!-- Notifications will appear here -->
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="glass-effect rounded-3xl p-8 max-w-md mx-4 animate-slide-up">
+            <div class="text-center">
+                <div class="text-6xl mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-4">Delete Report</h3>
+                <p class="text-gray-300 mb-8">Are you sure you want to delete this report? This action cannot be undone.</p>
+                <div class="flex space-x-4">
+                    <button onclick="closeDeleteModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Cancel
+                    </button>
+                    <button id="confirmDeleteBtn" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let currentUser = null;
+        let allReports = [];
+        let filteredReports = [];
+        let currentFilter = 'all';
+        let searchTimeout = null;
+        let reportToDelete = null;
+
+        // Notification System
+        function showNotification(type, message, duration = 5000) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation-circle'
+            };
+            
+            const colors = {
+                success: 'from-emerald-500 to-teal-600',
+                error: 'from-red-500 to-red-600',
+                info: 'from-blue-500 to-indigo-600',
+                warning: 'from-amber-500 to-orange-600'
+            };
+            
+            notification.className = `notification bg-gradient-to-r ${colors[type]} text-white p-4 rounded-2xl shadow-2xl max-w-sm`;
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <i class="${icons[type]} text-xl mt-1"></i>
+                    <div class="flex-1">
+                        <p class="font-semibold text-sm">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Trigger show animation
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // Initialize Application
+        window.addEventListener('load', async function() {
+            try {
+                console.log('Initializing application...');
+                await checkAuthentication();
+                await loadReports();
+                setupEventListeners();
+                showNotification('success', 'Reports loaded successfully!');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showNotification('error', `Failed to initialize application: ${error.message}`);
+                // Update the loading spinner with a more detailed error message
+                const spinner = document.getElementById('loadingSpinner');
+                if (spinner && !spinner.classList.contains('hidden')) {
+                    spinner.innerHTML = `
+                        <div class="text-center py-10">
+                            <div class="text-6xl mb-6 text-red-500">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-4">Application Error</h3>
+                            <p class="text-gray-300 mb-6">Failed to initialize the application:</p>
+                            <p class="text-red-300 mb-6 font-mono text-sm">${error.message}</p>
+                            <button onclick="location.reload()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-bold text-lg transition-all duration-300 flex items-center space-x-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Reload Page</span>
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        // Authentication Check
+        async function checkAuthentication() {
+            try {
+                console.log('Checking authentication...');
+                const response = await fetch('/api/check-auth');
+                console.log('Auth response status:', response.status);
+                
+                if (response.ok) {
+                    currentUser = await response.json();
+                    console.log('Current user:', currentUser);
+                    
+                    // Update user info display
+                    const userInfo = document.getElementById('userInfo');
+                    userInfo.innerHTML = `
+                        <i class="fas fa-user-circle mr-2 text-lg"></i>
+                        <span>${currentUser.full_name || currentUser.username || 'User'}</span>
+                    `;
+                    
+                    // Show admin panel if user is admin
+                    if (currentUser.role === 'admin') {
+                        document.getElementById('adminPanelLink').classList.remove('hidden');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error('Auth failed:', response.status, errorText);
+                    throw new Error(`Authentication failed (${response.status}): ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showNotification('error', `Authentication error: ${error.message}`);
+                // Redirect to login after a short delay
+                setTimeout(() => window.location.href = '/static/login.html', 3000);
+                throw error;
+            }
+        }
+
+        // Load Reports from API
+        async function loadReports() {
+            try {
+                showLoading(true);
+                console.log('Attempting to fetch reports from /api/reports');
+                const response = await fetch('/api/reports');
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log('Response text:', text);
+                    
+                    // Try to parse JSON
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch (parseError) {
+                        console.error('Failed to parse JSON:', parseError);
+                        console.error('Response text was:', text);
+                        throw new Error('Invalid JSON response from server');
+                    }
+                    
+                    allReports = data;
+                    
+                    // Debug log
+                    if (allReports.length > 0) {
+                        console.log('Sample report structure:', allReports[0]);
+                    }
+                    
+                    // Sort by date (newest first)
+                    allReports.sort((a, b) => new Date(b.report_date) - new Date(a.report_date));
+                    
+                    // Initialize filtered reports
+                    filteredReports = [...allReports];
+                    
+                    // Display reports
+                    displayReports();
+                    updateReportsCount();
+                } else {
+                    const errorText = await response.text();
+                    console.error('Server returned error:', response.status, errorText);
+                    throw new Error(`Server error ${response.status}: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error loading reports:', error);
+                showNotification('error', `Failed to load reports: ${error.message}`);
+                // Show a more user-friendly message
+                document.getElementById('loadingSpinner').innerHTML = `
+                    <div class="text-center py-10">
+                        <div class="text-6xl mb-6 text-red-500">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4">Unable to Load Reports</h3>
+                        <p class="text-gray-300 mb-6">There was an error connecting to the server. Please check:</p>
+                        <ul class="text-gray-300 mb-6 text-left max-w-md mx-auto">
+                            <li class="mb-2 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                If the server is running (port 8080)
+                            </li>
+                            <li class="mb-2 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                If the database is properly configured
+                            </li>
+                            <li class="mb-2 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                If you're logged in
+                            </li>
+                        </ul>
+                        <button onclick="refreshReports()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-bold text-lg transition-all duration-300 flex items-center space-x-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Try Again</span>
+                        </button>
+                    </div>
+                `;
+                throw error;
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Display Loading State
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            const container = document.getElementById('reportsContainer');
+            const noReports = document.getElementById('noReportsMessage');
+            
+            if (show) {
+                spinner.classList.remove('hidden');
+                container.classList.add('hidden');
+                noReports.classList.add('hidden');
+            } else {
+                spinner.classList.add('hidden');
+                container.classList.remove('hidden');
+            }
+        }
+
+        // Display Reports
+        function displayReports() {
+            const container = document.getElementById('reportsContainer');
+            const noReports = document.getElementById('noReportsMessage');
+            
+            if (filteredReports.length === 0) {
+                container.classList.add('hidden');
+                noReports.classList.remove('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            noReports.classList.add('hidden');
+            
+            container.innerHTML = filteredReports.map((report, index) => {
+                return createReportCard(report, index);
+            }).join('');
+        }
+
+        // Create Individual Report Card
+        function createReportCard(report, index) {
+            // Check if any events have RCA data
+            const hasRca = (report.EventsPart3 && report.EventsPart3.some(event => event.rca_number && event.rca_number.trim() !== '')) || 
+                          (report.events_part3 && report.events_part3.some(event => event.rca_number && event.rca_number.trim() !== '')) ||
+                          (report.EventsPart3 && report.EventsPart3.some(event => event.RCANumber && event.RCANumber.trim() !== '')) ||
+                          (report.events_part3 && report.events_part3.some(event => event.RCANumber && event.RCANumber.trim() !== ''));
+            const isHealthCheck = report.event_titles && report.event_titles.some(title => 
+                title.title?.toLowerCase().includes('health')) ||
+                (report.EventsPart3 && report.EventsPart3.some(event => 
+                    (event.EventSummary && event.EventSummary.toLowerCase().includes('health')) || 
+                    (event.Trigger && event.Trigger.toLowerCase().includes('health')))) ||
+                (report.EventsPart4 && report.EventsPart4.some(event => 
+                    (event.EventSummary && event.EventSummary.toLowerCase().includes('health')) || 
+                    (event.Trigger && event.Trigger.toLowerCase().includes('health')))) ||
+                (report.events_part3 && report.events_part3.some(event => 
+                    (event.event_summary && event.event_summary.toLowerCase().includes('health')) || 
+                    (event.trigger_info && event.trigger_info.toLowerCase().includes('health')))) ||
+                (report.events_part4 && report.events_part4.some(event => 
+                    (event.event_summary && event.event_summary.toLowerCase().includes('health')) || 
+                    (event.trigger_info && event.trigger_info.toLowerCase().includes('health'))));
+            
+            let statusClass, statusText, statusIcon;
+            if (hasRca) {
+                statusClass = 'status-with-rca';
+                statusText = 'With RCA';
+                statusIcon = 'fas fa-exclamation-triangle';
+            } else if (isHealthCheck) {
+                statusClass = 'status-health-check';
+                statusText = 'Health Check';
+                statusIcon = 'fas fa-heartbeat';
+            } else {
+                statusClass = 'status-without-rca';
+                statusText = 'Without RCA';
+                statusIcon = 'fas fa-exclamation-circle';
+            }
+            
+            const userName = report.full_name || report.user_name || report.username || report.created_by?.full_name || report.created_by?.username || 'Unknown User';
+            // Updated to handle nested shift_hours object
+            const shiftName = report.shift_hours ? report.shift_hours.name : (report.ShiftHours ? report.ShiftHours.name : 'N/A');
+            const shiftHours = report.shift_hours ? 
+                (formatTime(report.shift_hours.start_time) || 'N/A') + ' - ' + (formatTime(report.shift_hours.end_time) || 'N/A') : 
+                (report.ShiftHours ? 
+                (formatTime(report.ShiftHours.start_time) || 'N/A') + ' - ' + (formatTime(report.ShiftHours.end_time) || 'N/A') : 
+                'N/A - N/A');
+            
+            // Generate event description content
+            let eventDescription = 'No description provided';
+            if (report.event_titles && report.event_titles.length > 0) {
+                eventDescription = report.event_titles.map(title => title.title).join(', ');
+            } else if (report.EventTitles && report.EventTitles.length > 0) {
+                eventDescription = report.EventTitles.map(title => title.title).join(', ');
+            }
+            
+            // Generate RCA content if applicable
+            let rcaContent = '';
+            if (hasRca) {
+                let rcaItems = [];
+                if (report.EventsPart3 && report.EventsPart3.length > 0) {
+                    rcaItems = report.EventsPart3.filter(event => event.RCANumber || event.rca_number)
+                        .map(event => '<div><strong>Event:</strong> ' + (event.EventSummary || event.event_summary || 'N/A') + '<br><strong>RCA:</strong> ' + (event.RCANumber || event.rca_number || 'N/A') + '</div>');
+                } else if (report.events_part3 && report.events_part3.length > 0) {
+                    rcaItems = report.events_part3.filter(event => event.RCANumber || event.rca_number)
+                        .map(event => '<div><strong>Event:</strong> ' + (event.EventSummary || event.event_summary || 'N/A') + '<br><strong>RCA:</strong> ' + (event.RCANumber || event.rca_number || 'N/A') + '</div>');
+                }
+                rcaContent = rcaItems.join('<br>');
+            }
+            
+            const reportTitle = report.event_titles && report.event_titles.length > 0 ? report.event_titles[0].title : (report.EventTitles && report.EventTitles.length > 0 ? report.EventTitles[0].title : 'Untitled Report');
+            
+            return `
+                <div class="report-card glass-effect glass-hover rounded-3xl p-8 animate-slide-up shadow-2xl" style="animation-delay: ${index * 0.1}s">
+                    <!-- Report Header -->
+                    <div class="flex justify-between items-start mb-8">
+                        <div class="flex items-center space-x-6">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-file-alt text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white mb-2">${reportTitle}</h3>
+                                <div class="flex items-center space-x-4 text-gray-300">
+                                    <span class="flex items-center space-x-2">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span>${formatDate(report.report_date)}</span>
+                                    </span>
+                                    <span class="flex items-center space-x-2">
+                                        <i class="fas fa-clock"></i>
+                                        <span>${shiftName}</span>
+                                    </span>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="status-badge ${statusClass}">
+                            <i class="${statusIcon}"></i>
+                            <span>${statusText}</span>
+                        </div>
+                    </div>
+                    
+                   
+                        
+                        <!-- Report Metadata -->
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Report Information</span>
+                            </div>
+                            <div class="detail-content">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-purple-300 font-semibold">Created by:</span>
+                                            <span class="text-white font-medium">${userName}</span>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-purple-300 font-semibold">Shift Hours:</span>
+                                            <span class="text-white font-medium">${shiftHours}</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-purple-300 font-semibold">Created on:</span>
+                                            <span class="text-white font-medium">${formatDateTime(report.created_at || report.CreatedAt || report.report_date)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between items-center pt-8 border-t border-white/10 mt-8">
+                        <div class="flex items-center space-x-3 text-gray-400">
+                            <div class="w-10 h-10 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-white">${userName}</p>
+                                <p class="text-sm">Report Author</p>
+                            </div>
+                        </div>
+                        
+                        ${(currentUser.role === 'admin' || currentUser.id === (report.user_id || report.created_by?.id || report.CreatedBy?.id)) ? `
+                            <div class="flex space-x-4">
+                                <button onclick="editReport(${report.id})" class="action-button bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Edit / View</span>
+                                </button>
+                                <button onclick="showDeleteModal(${report.id})" class="action-button bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                    <i class="fas fa-trash"></i>
+                                    <span>Delete</span>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update Reports Count Display
+        function updateReportsCount() {
+            const countElement = document.getElementById('reportsCount');
+            const totalCountElement = document.getElementById('totalReportsCount');
+            
+            countElement.textContent = filteredReports.length;
+            
+            if (filteredReports.length !== allReports.length) {
+                totalCountElement.textContent = ` of ${allReports.length} total`;
+            } else {
+                totalCountElement.textContent = '';
+            }
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Search input with debounce
+            const searchInput = document.getElementById('searchInput');
+            const searchClearBtn = document.getElementById('searchClearBtn');
+            
+            searchInput.addEventListener('input', function(e) {
+                const value = e.target.value;
+                
+                // Show/hide clear button
+                if (value) {
+                    searchClearBtn.classList.remove('hidden');
+                } else {
+                    searchClearBtn.classList.add('hidden');
+                }
+                
+                // Debounced search
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    applyFilters();
+                }, 300);
+            });
+            
+            // Clear search button
+            searchClearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                searchClearBtn.classList.add('hidden');
+                applyFilters();
+            });
+            
+            // Date range filters
+            document.getElementById('startDate').addEventListener('change', applyFilters);
+            document.getElementById('endDate').addEventListener('change', applyFilters);
+            
+            // Delete confirmation button
+            document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+                if (!reportToDelete) return;
+                
+                try {
+                    const response = await fetch(`/api/reports/${reportToDelete}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        showNotification('success', 'Report deleted successfully!');
+                        closeDeleteModal();
+                        await loadReports();
+                    } else {
+                        const errorText = await response.text();
+                        showNotification('error', `Failed to delete report: ${errorText}`);
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    showNotification('error', 'Connection error while deleting report');
+                }
+            });
+            
+            // Close modal when clicking outside
+            document.getElementById('deleteModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteModal();
+                }
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Escape key to close modal
+                if (e.key === 'Escape') {
+                    closeDeleteModal();
+                }
+                
+                // Ctrl/Cmd + K to focus search
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+            });
+        }
+
+        // Filter Reports by Status
+        function filterReports(status) {
+            // Update active filter button
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentFilter = status;
+            applyFilters();
+        }
+
+        // Apply All Filters
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            filteredReports = allReports.filter(report => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    (report.event_titles && report.event_titles.some(title => title.title?.toLowerCase().includes(searchTerm))) ||
+                    report.rca?.toLowerCase().includes(searchTerm) ||
+                    report.full_name?.toLowerCase().includes(searchTerm) ||
+                    report.user_name?.toLowerCase().includes(searchTerm) ||
+                    report.username?.toLowerCase().includes(searchTerm) ||
+                    (report.shift_hours && report.shift_hours.name?.toLowerCase().includes(searchTerm)) ||
+                    report.id.toString().includes(searchTerm);
+                
+                // Status filter
+                const hasRca = report.rca && report.rca.trim() !== '';
+                const isHealthCheck = report.event_titles && report.event_titles.some(title => 
+                    title.title?.toLowerCase().includes('health'));
+                
+                let matchesStatus = true;
+                switch(currentFilter) {
+                    case 'with_rca':
+                        matchesStatus = hasRca;
+                        break;
+                    case 'without_rca':
+                        matchesStatus = !hasRca && !isHealthCheck;
+                        break;
+                    case 'health_check':
+                        matchesStatus = isHealthCheck;
+                        break;
+                    case 'all':
+                    default:
+                        matchesStatus = true;
+                }
+                
+                // Date range filter
+                let matchesDateRange = true;
+                if (startDate || endDate) {
+                    const reportDate = new Date(report.report_date);
+                    if (startDate) {
+                        matchesDateRange = matchesDateRange && reportDate >= new Date(startDate);
+                    }
+                    if (endDate) {
+                        matchesDateRange = matchesDateRange && reportDate <= new Date(endDate);
+                    }
+                }
+                
+                return matchesSearch && matchesStatus && matchesDateRange;
+            });
+            
+            displayReports();
+            updateReportsCount();
+        }
+
+        // Clear Date Filter
+        function clearDateFilter() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            applyFilters();
+        }
+
+        // Clear All Filters
+        function clearAllFilters() {
+            // Clear search
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchClearBtn').classList.add('hidden');
+            
+            // Clear date filters
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            
+            // Reset to 'all' filter
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.filter-button[onclick="filterReports(\'all\')"]').classList.add('active');
+            
+            currentFilter = 'all';
+            filteredReports = [...allReports];
+            displayReports();
+            updateReportsCount();
+            
+            showNotification('info', 'All filters cleared');
+        }
+
+        // Refresh Reports
+        async function refreshReports() {
+            showNotification('info', 'Refreshing reports...');
+            try {
+                await loadReports();
+                showNotification('success', 'Reports refreshed successfully!');
+            } catch (error) {
+                showNotification('error', 'Failed to refresh reports');
+            }
+        }
+
+        // Edit Report
+        function editReport(reportId) {
+            // Find the report data
+            const report = allReports.find(r => r.id === reportId);
+            if (report) {
+                // Store report data in sessionStorage for the edit form
+                sessionStorage.setItem('editReportData', JSON.stringify(report));
+                window.location.href = `/static/report-form.html?edit=${reportId}`;
+            } else {
+                showNotification('error', 'Report not found for editing');
+            }
+        }
+
+        // Show Delete Modal
+        function showDeleteModal(reportId) {
+            reportToDelete = reportId;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        // Close Delete Modal
+        function closeDeleteModal() {
+            reportToDelete = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        // Logout Function
+        async function logout() {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                showNotification('success', 'Logged out successfully!');
+                setTimeout(() => {
+                    window.location.href = '/static/login.html';
+                }, 1000);
+            } catch (error) {
+                window.location.href = '/static/login.html';
+            }
+        }
+
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateTime(dateString) {
+            // If this is already in hh:mm format, return as is
+            if (dateString && dateString.match(/^\d{2}:\d{2}$/)) {
+                return dateString;
+            }
+            
+            // If it's a time-only string in HH:MM:SS format, extract HH:MM
+            if (dateString && dateString.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return dateString.substring(0, 5);
+            }
+            
+            // Otherwise, parse as a full date and extract time
+            const date = new Date(dateString);
+            
+            // Check if it's a valid date
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
+            
+            // Format as hh:mm
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // New function to format time specifically
+        function formatTime(timeString) {
+            // If this is already in hh:mm format, return as is
+            if (timeString && timeString.match(/^\d{2}:\d{2}$/)) {
+                return timeString;
+            }
+            
+            // If it's a time-only string in HH:MM:SS format, extract HH:MM
+            if (timeString && timeString.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return timeString.substring(0, 5);
+            }
+            
+            // If it's a full datetime string, extract the time portion
+            if (timeString && timeString.includes('T')) {
+                const timePart = timeString.split('T')[1];
+                if (timePart) {
+                    // Remove the 'Z' at the end if present and extract HH:MM
+                    const cleanTime = timePart.replace('Z', '');
+                    if (cleanTime.match(/^\d{2}:\d{2}:\d{2}/)) {
+                        return cleanTime.substring(0, 5);
+                    }
+                }
+            }
+            
+            // Otherwise, try to parse as a full date and extract time
+            const date = new Date(timeString);
+            
+            // Check if it's a valid date
+            if (isNaN(date.getTime())) {
+                return timeString || 'N/A';
+            }
+            
+            // Format as hh:mm
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+    </script>
+</body>
+</html>

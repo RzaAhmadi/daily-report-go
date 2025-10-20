@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Daily Report System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        body {
+            box-sizing: border-box;
+        }
+        
+        @keyframes slideInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(50px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+            }
+            70% { 
+                box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-slide-up {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-pulse-ring {
+            animation: pulse 2s infinite;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-hover:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+        
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        
+        .tab-button:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            outline: none;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .data-table {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(124, 58, 237, 0.3));
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .table-row {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .table-row:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.01);
+        }
+        
+        .action-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .action-button:hover::before {
+            left: 100%;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #8b5cf6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .status-admin {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .status-user {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .api-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .api-connected {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .api-disconnected {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen custom-scrollbar">
+    <!-- API Status Indicator -->
+    <div id="apiStatus" class="api-status api-disconnected">
+        <i class="fas fa-wifi mr-1"></i>
+        <span>Demo Mode</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="glass-effect sticky top-0 z-40 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-4">
+                                       <a href="/" target="_blank" rel="noopener noreferrer">
+  <img src="200.png" alt="لوگوی شرکت" width="100" height="auto">
+</a>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">Admin Panel</h1>
+                        <p class="text-purple-200 text-sm font-medium">System Management Dashboard</p>
+                    </div>
+                </div>
+                
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <!-- User Info -->
+                    <div class="glass-effect px-4 py-2 rounded-xl">
+                        <span id="userInfo" class="text-white font-semibold flex items-center">
+                            <i class="fas fa-user-shield mr-2 text-lg text-red-400"></i>
+                            <span>Loading...</span>
+                        </span>
+                    </div>
+                    
+                    <!-- Back to Reports -->
+                    <a href="/static/reports-list.html" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-list"></i>
+                        <span>Reports</span>
+                    </a>
+                      <!-- New Report Button -->
+                    <a href="/static/report-form.html" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-plus"></i>
+                        <span>New Report</span>
+                    </a>
+                    
+                    <!-- Logout Button -->
+                    <button onclick="logout()" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Page Header -->
+        <div class="text-center mb-12 animate-fade-in">
+            <h2 class="text-5xl font-bold text-white mb-4 animate-float">
+                <span class="gradient-text">System Administration</span>
+            </h2>
+            <p class="text-xl text-purple-200 font-medium">Manage users, shifts, and system settings</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="glass-effect rounded-3xl p-2 mb-8 animate-slide-up">
+            <div class="flex flex-wrap gap-2">
+                <button onclick="switchTab('users')" class="tab-button active flex-1 px-6 py-4 rounded-2xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2">
+                    <i class="fas fa-users"></i>
+                    <span>Users Management</span>
+                </button>
+                <button onclick="switchTab('shifts')" class="tab-button flex-1 px-6 py-4 rounded-2xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2">
+                    <i class="fas fa-clock"></i>
+                    <span>Shifts Management</span>
+                </button>
+                <button onclick="switchTab('eventtitles')" class="tab-button flex-1 px-6 py-4 rounded-2xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2">
+                    <i class="fas fa-tags"></i>
+                    <span>Event Titles</span>
+                </button>
+                <button onclick="switchTab('reports')" class="tab-button flex-1 px-6 py-4 rounded-2xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports Overview</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Users Management Tab -->
+        <div id="usersTab" class="tab-content active">
+            <!-- Add User Form -->
+            <div class="glass-effect rounded-3xl p-8 mb-8 animate-slide-up">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <i class="fas fa-user-plus mr-3 text-green-400"></i>
+                    Add New User
+                </h3>
+                <form id="addUserForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Username</label>
+                        <input type="text" id="newUsername" class="form-input w-full px-4 py-3 rounded-xl" placeholder="Enter username" required>
+                    </div>
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Full Name</label>
+                        <input type="text" id="newFullName" class="form-input w-full px-4 py-3 rounded-xl" placeholder="Enter full name" required>
+                    </div>
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Email</label>
+                        <input type="email" id="newEmail" class="form-input w-full px-4 py-3 rounded-xl" placeholder="Enter email" required disabled value="example@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Password</label>
+                        <input type="password" id="newPassword" class="form-input w-full px-4 py-3 rounded-xl" placeholder="Enter password" required>
+                    </div>
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Role</label>
+                        <select id="newRole" class="form-input w-full px-4 py-3 rounded-xl" required>
+                            <option value="">Select role</option>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="action-button w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <i class="fas fa-plus"></i>
+                            <span>Add User</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Users List -->
+            <div class="glass-effect rounded-3xl p-8 animate-slide-up">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-users mr-3 text-blue-400"></i>
+                        Users List
+                        <span id="usersCount" class="ml-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">0</span>
+                    </h3>
+                    <button onclick="loadUsers()" class="action-button bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+                
+                <div class="data-table overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                              
+                                <th class="px-6 py-4 text-left">Username</th>
+                                <th class="px-6 py-4 text-left">Full Name</th>
+                              
+                                <th class="px-6 py-4 text-left">Role</th>
+                            
+                                <th class="px-6 py-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody" class="text-white">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="usersLoading" class="text-center py-12">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-white font-semibold">Loading users...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shifts Management Tab -->
+        <div id="shiftsTab" class="tab-content">
+            <!-- Add Shift Form -->
+            <div class="glass-effect rounded-3xl p-8 mb-8 animate-slide-up">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <i class="fas fa-clock mr-3 text-green-400"></i>
+                    Add New Shift
+                </h3>
+                <form id="addShiftForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Shift Name</label>
+                        <input type="text" id="newShiftName" class="form-input w-full px-4 py-3 rounded-xl" placeholder="e.g., Morning Shift" required>
+                    </div>
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Start Time</label>
+                        <input type="time" id="newStartTime" class="form-input w-full px-4 py-3 rounded-xl" required>
+                    </div>
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">End Time</label>
+                        <input type="time" id="newEndTime" class="form-input w-full px-4 py-3 rounded-xl" required>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="action-button w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Shift</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Shifts List -->
+            <div class="glass-effect rounded-3xl p-8 animate-slide-up">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-clock mr-3 text-blue-400"></i>
+                        Shifts List
+                        <span id="shiftsCount" class="ml-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">0</span>
+                    </h3>
+                    <button onclick="loadShifts()" class="action-button bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+                
+                <div class="data-table overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                              
+                                <th class="px-6 py-4 text-left">Shift Name</th>
+                                <th class="px-6 py-4 text-left">Start Time</th>
+                                <th class="px-6 py-4 text-left">End Time</th>
+                              
+                                <th class="px-6 py-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shiftsTableBody" class="text-white">
+                            <!-- Shifts will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="shiftsLoading" class="text-center py-12">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-white font-semibold">Loading shifts...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Titles Management Tab -->
+        <div id="eventtitlesTab" class="tab-content">
+            <!-- Add Event Title Form -->
+            <div class="glass-effect rounded-3xl p-8 mb-8 animate-slide-up">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <i class="fas fa-tag mr-3 text-green-400"></i>
+                    Add New Event Title
+                </h3>
+                <form id="addEventTitleForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2">
+                        <label class="block text-purple-200 font-semibold mb-2">Event Title</label>
+                        <input type="text" id="newEventTitle" class="form-input w-full px-4 py-3 rounded-xl" placeholder="Enter event title" required>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="action-button w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Event Title</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Event Titles List -->
+            <div class="glass-effect rounded-3xl p-8 animate-slide-up">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-tags mr-3 text-blue-400"></i>
+                        Event Titles List
+                        <span id="eventTitlesCount" class="ml-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">0</span>
+                    </h3>
+                    <button onclick="loadEventTitles()" class="action-button bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+                
+                <div class="data-table overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-6 py-4 text-left">ID</th>
+                                <th class="px-6 py-4 text-left">Title</th>
+                                <th class="px-6 py-4 text-left">Created At</th>
+                                <th class="px-6 py-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventTitlesTableBody" class="text-white">
+                            <!-- Event titles will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="eventTitlesLoading" class="text-center py-12">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-white font-semibold">Loading event titles...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Event Title Modal -->
+        <div id="editEventTitleModal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center hidden">
+            <div class="glass-effect rounded-3xl p-8 max-w-md mx-4 animate-slide-up">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <i class="fas fa-tag mr-3 text-blue-400"></i>
+                    Edit Event Title
+                </h3>
+                <form id="editEventTitleForm" class="space-y-4">
+                    <input type="hidden" id="editEventTitleId">
+                    <div>
+                        <label class="block text-purple-200 font-semibold mb-2">Event Title</label>
+                        <input type="text" id="editEventTitleText" class="form-input w-full px-4 py-3 rounded-xl" required>
+                    </div>
+                    <div class="flex space-x-4 pt-4">
+                        <button type="button" onclick="closeEditEventTitleModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                            Update Event Title
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Reports Overview Tab -->
+        <div id="reportsTab" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Statistics Cards -->
+                <div class="glass-effect rounded-2xl p-6 text-center animate-slide-up">
+                    <div class="text-4xl mb-4">
+                        <i class="fas fa-file-alt text-blue-400"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-2" id="totalReports">0</h4>
+                    <p class="text-purple-200">Total Reports</p>
+                </div>
+                
+                <div class="glass-effect rounded-2xl p-6 text-center animate-slide-up" style="animation-delay: 0.1s">
+                    <div class="text-4xl mb-4">
+                        <i class="fas fa-exclamation-triangle text-red-400"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-2" id="reportsWithRCA">0</h4>
+                    <p class="text-purple-200">With RCA</p>
+                </div>
+                
+                <div class="glass-effect rounded-2xl p-6 text-center animate-slide-up" style="animation-delay: 0.2s">
+                    <div class="text-4xl mb-4">
+                        <i class="fas fa-heartbeat text-green-400"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-2" id="healthCheckReports">0</h4>
+                    <p class="text-purple-200">Health Checks</p>
+                </div>
+                
+                <div class="glass-effect rounded-2xl p-6 text-center animate-slide-up" style="animation-delay: 0.3s">
+                    <div class="text-4xl mb-4">
+                        <i class="fas fa-calendar-day text-purple-400"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-2" id="todayReports">0</h4>
+                    <p class="text-purple-200">Today's Reports</p>
+                </div>
+            </div>
+
+            <!-- Recent Reports -->
+            <div class="glass-effect rounded-3xl p-8 animate-slide-up">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-history mr-3 text-blue-400"></i>
+                        Recent Reports
+                    </h3>
+                    <a href="/static/reports-list.html" class="action-button bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>View All</span>
+                    </a>
+                </div>
+                
+                <div class="data-table overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-6 py-4 text-left">ID</th>
+                                <th class="px-6 py-4 text-left">Title</th>
+                                <th class="px-6 py-4 text-left">User</th>
+                                <th class="px-6 py-4 text-left">Date</th>
+                                <th class="px-6 py-4 text-left">Status</th>
+                                <th class="px-6 py-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentReportsTableBody" class="text-white">
+                            <!-- Recent reports will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="reportsLoading" class="text-center py-12">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-white font-semibold">Loading reports...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center hidden">
+        <div class="glass-effect rounded-3xl p-8 max-w-md mx-4 animate-slide-up">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                <i class="fas fa-user-edit mr-3 text-blue-400"></i>
+                Edit User
+            </h3>
+            <form id="editUserForm" class="space-y-4">
+                <input type="hidden" id="editUserId">
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">Username</label>
+                    <input type="text" id="editUsername" class="form-input w-full px-4 py-3 rounded-xl" required>
+                </div>
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">Full Name</label>
+                    <input type="text" id="editFullName" class="form-input w-full px-4 py-3 rounded-xl" required>
+                </div>
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">Email</label>
+                    <input type="email" id="editEmail" class="form-input w-full px-4 py-3 rounded-xl" required value="example@example.com">
+                </div>
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">New Password (leave empty to keep current)</label>
+                    <input type="password" id="editPassword" class="form-input w-full px-4 py-3 rounded-xl" placeholder="Enter new password">
+                </div>
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">Role</label>
+                    <select id="editRole" class="form-input w-full px-4 py-3 rounded-xl" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" onclick="closeEditUserModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Update User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Shift Modal -->
+    <div id="editShiftModal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center hidden">
+        <div class="glass-effect rounded-3xl p-8 max-w-md mx-4 animate-slide-up">
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                <i class="fas fa-clock mr-3 text-blue-400"></i>
+                Edit Shift
+            </h3>
+            <form id="editShiftForm" class="space-y-4">
+                <input type="hidden" id="editShiftId">
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">Shift Name</label>
+                    <input type="text" id="editShiftName" class="form-input w-full px-4 py-3 rounded-xl" required>
+                </div>
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">Start Time</label>
+                    <input type="time" id="editStartTime" class="form-input w-full px-4 py-3 rounded-xl" required>
+                </div>
+                <div>
+                    <label class="block text-purple-200 font-semibold mb-2">End Time</label>
+                    <input type="time" id="editEndTime" class="form-input w-full px-4 py-3 rounded-xl" required>
+                </div>
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" onclick="closeEditShiftModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Update Shift
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center hidden">
+        <div class="glass-effect rounded-3xl p-8 max-w-md mx-4 animate-slide-up">
+            <div class="text-center">
+                <div class="text-6xl mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-4">Confirm Deletion</h3>
+                <p class="text-gray-300 mb-8" id="deleteMessage">آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟ این اقدام قابل بازگشت نیست.
+</p>
+                <div class="flex space-x-4">
+                    <button onclick="closeDeleteModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Cancel
+                    </button>
+                    <button id="confirmDeleteBtn" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-6 right-6 z-50 space-y-4 max-w-sm">
+        <!-- Notifications will appear here -->
+    </div>
+
+    <script>
+        // Global Variables
+        let currentUser = null;
+        let currentTab = 'users';
+        let deleteCallback = null;
+        let isApiConnected = false;
+
+        // API Configuration
+        const API_BASE_URL = '/api'; // Change this to your backend URL
+        const API_ENDPOINTS = {
+            auth: {
+                login: `${API_BASE_URL}/login`,
+                logout: `${API_BASE_URL}/logout`,
+                me: `${API_BASE_URL}/check-auth`
+            },
+            users: {
+                list: `${API_BASE_URL}/users`,
+                create: `${API_BASE_URL}/users`,
+                update: (id) => `${API_BASE_URL}/users/${id}`,
+                delete: (id) => `${API_BASE_URL}/users/${id}`
+            },
+            shifts: {
+                list: `${API_BASE_URL}/shift-hours`,
+                create: `${API_BASE_URL}/shift-hours`,
+                update: (id) => `${API_BASE_URL}/shift-hours/${id}`,
+                delete: (id) => `${API_BASE_URL}/shift-hours/${id}`
+            },
+            reports: {
+                list: `${API_BASE_URL}/reports`,
+                stats: `${API_BASE_URL}/reports`
+            },
+            eventtitles: {
+                list: `${API_BASE_URL}/event-titles`,
+                create: `${API_BASE_URL}/event-titles`,
+                update: (id) => `${API_BASE_URL}/event-titles/${id}`,
+                delete: (id) => `${API_BASE_URL}/event-titles/${id}`
+            }
+        };
+
+        // API Helper Functions
+        async function apiRequest(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include' // Include cookies for session management
+            };
+
+            // Get auth token from localStorage if available
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                defaultOptions.headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const config = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            };
+
+            try {
+                const response = await fetch(url, config);
+                
+                // Handle authentication errors
+                if (response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    showNotification('error', 'Session expired. Please login again.');
+                    setTimeout(() => window.location.href = '/static/login.html', 2000);
+                    throw new Error('Authentication failed');
+                }
+
+                // Handle other HTTP errors
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                // Mark API as connected
+                updateApiStatus(true);
+
+                // Return JSON data
+                return await response.json();
+            } catch (error) {
+                console.error('API Request failed:', error);
+                
+                // Mark API as disconnected
+                updateApiStatus(false);
+                
+                // Fallback to localStorage for demo purposes if API fails
+                if (url.includes('/users') || url.includes('/shift-hours') || url.includes('/reports')) {
+                    console.warn('API failed, falling back to localStorage demo data');
+                    return handleFallbackData(url, options);
+                }
+                
+                throw error;
+            }
+        }
+
+        // Update API Status Indicator
+        function updateApiStatus(connected) {
+            isApiConnected = connected;
+            const statusElement = document.getElementById('apiStatus');
+            
+            if (connected) {
+                statusElement.className = 'api-status api-connected';
+                statusElement.innerHTML = '<i class="fas fa-wifi mr-1"></i>';
+            } else {
+                statusElement.className = 'api-status api-disconnected';
+                statusElement.innerHTML = '<i class="fas fa-wifi mr-1"></i>';
+            }
+        }
+
+        // Fallback data handler for demo purposes
+        function handleFallbackData(url, options) {
+            if (url.includes('/users')) {
+                if (options.method === 'POST') {
+                    // Create user
+                    const users = JSON.parse(localStorage.getItem('users') || '[]');
+                    const userData = JSON.parse(options.body);
+                    const newUser = {
+                        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                        ...userData,
+                        created_at: new Date().toISOString()
+                    };
+                    users.push(newUser);
+                    localStorage.setItem('users', JSON.stringify(users));
+                    return newUser;
+                } else if (options.method === 'PUT') {
+                    // Update user
+                    const users = JSON.parse(localStorage.getItem('users') || '[]');
+                    const userId = parseInt(url.split('/').pop());
+                    const userData = JSON.parse(options.body);
+                    const userIndex = users.findIndex(u => u.id === userId);
+                    if (userIndex !== -1) {
+                        users[userIndex] = { ...users[userIndex], ...userData, updated_at: new Date().toISOString() };
+                        localStorage.setItem('users', JSON.stringify(users));
+                        return users[userIndex];
+                    }
+                } else if (options.method === 'DELETE') {
+                    // Delete user
+                    const users = JSON.parse(localStorage.getItem('users') || '[]');
+                    const userId = parseInt(url.split('/').pop());
+                    const filteredUsers = users.filter(u => u.id !== userId);
+                    localStorage.setItem('users', JSON.stringify(filteredUsers));
+                    return { success: true };
+                } else {
+                    // Get users
+                    const users = JSON.parse(localStorage.getItem('users') || '[]');
+                    if (users.length === 0) {
+                        const defaultUsers = [
+                            {
+                                id: 1,
+                                username: 'admin',
+                                full_name: 'System Administrator',
+                                email: 'admin@example.com',
+                                role: 'admin',
+                                created_at: new Date().toISOString()
+                            }
+                        ];
+                        localStorage.setItem('users', JSON.stringify(defaultUsers));
+                        return defaultUsers;
+                    }
+                    return users;
+                }
+            } else if (url.includes('/shift-hours')) {
+                if (options.method === 'POST') {
+                    // Create shift
+                    const shifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+                    const shiftData = JSON.parse(options.body);
+                    const newShift = {
+                        id: shifts.length > 0 ? Math.max(...shifts.map(s => s.id)) + 1 : 1,
+                        ...shiftData,
+                        created_at: new Date().toISOString()
+                    };
+                    shifts.push(newShift);
+                    localStorage.setItem('shifts', JSON.stringify(shifts));
+                    return newShift;
+                } else if (options.method === 'PUT') {
+                    // Update shift
+                    const shifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+                    const shiftId = parseInt(url.split('/').pop());
+                    const shiftData = JSON.parse(options.body);
+                    const shiftIndex = shifts.findIndex(s => s.id === shiftId);
+                    if (shiftIndex !== -1) {
+                        shifts[shiftIndex] = { ...shifts[shiftIndex], ...shiftData, updated_at: new Date().toISOString() };
+                        localStorage.setItem('shifts', JSON.stringify(shifts));
+                        return shifts[shiftIndex];
+                    }
+                } else if (options.method === 'DELETE') {
+                    // Delete shift
+                    const shifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+                    const shiftId = parseInt(url.split('/').pop());
+                    const filteredShifts = shifts.filter(s => s.id !== shiftId);
+                    localStorage.setItem('shifts', JSON.stringify(filteredShifts));
+                    return { success: true };
+                } else {
+                    // Get shifts
+                    const shifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+                    if (shifts.length === 0) {
+                        const defaultShifts = [
+                            { id: 1, name: 'Morning Shift', start_time: '08:00', end_time: '16:00', created_at: new Date().toISOString() },
+                            { id: 2, name: 'Evening Shift', start_time: '16:00', end_time: '00:00', created_at: new Date().toISOString() },
+                            { id: 3, name: 'Night Shift', start_time: '00:00', end_time: '08:00', created_at: new Date().toISOString() }
+                        ];
+                        localStorage.setItem('shifts', JSON.stringify(defaultShifts));
+                        return defaultShifts;
+                    }
+                    return shifts;
+                }
+            } else if (url.includes('/reports')) {
+                const reports = JSON.parse(localStorage.getItem('reports') || '[]');
+                if (reports.length === 0) {
+                    const sampleReports = [
+                        {
+                            id: 1,
+                            event_title: 'Server Health Check',
+                            event_description: 'Daily server monitoring',
+                            username: 'admin',
+                            full_name: 'System Administrator',
+                            report_date: new Date().toISOString().split('T')[0],
+                            rca: 'All systems operational',
+                            created_at: new Date().toISOString()
+                        },
+                        {
+                            id: 2,
+                            event_title: 'Network Issue',
+                            event_description: 'Brief connectivity problem',
+                            username: 'admin',
+                            full_name: 'System Administrator',
+                            report_date: new Date(Date.now() - 86000000).toISOString().split('T')[0],
+                            rca: '',
+                            created_at: new Date(Date.now() - 86400000).toISOString()
+                        }
+                    ];
+                    localStorage.setItem('reports', JSON.stringify(sampleReports));
+                    return sampleReports;
+                }
+                return reports;
+            } else if (url.includes('/event-titles')) {
+                if (options.method === 'POST') {
+                    // Create event title
+                    const eventTitles = JSON.parse(localStorage.getItem('eventTitles') || '[]');
+                    const eventTitleData = JSON.parse(options.body);
+                    const newEventTitle = {
+                        id: eventTitles.length > 0 ? Math.max(...eventTitles.map(et => et.id)) + 1 : 1,
+                        ...eventTitleData,
+                        created_at: new Date().toISOString()
+                    };
+                    eventTitles.push(newEventTitle);
+                    localStorage.setItem('eventTitles', JSON.stringify(eventTitles));
+                    return newEventTitle;
+                } else if (options.method === 'PUT') {
+                    // Update event title
+                    const eventTitles = JSON.parse(localStorage.getItem('eventTitles') || '[]');
+                    const eventTitleId = parseInt(url.split('/').pop());
+                    const eventTitleData = JSON.parse(options.body);
+                    const eventTitleIndex = eventTitles.findIndex(et => et.id === eventTitleId);
+                    if (eventTitleIndex !== -1) {
+                        eventTitles[eventTitleIndex] = { ...eventTitles[eventTitleIndex], ...eventTitleData, updated_at: new Date().toISOString() };
+                        localStorage.setItem('eventTitles', JSON.stringify(eventTitles));
+                        return eventTitles[eventTitleIndex];
+                    }
+                } else if (options.method === 'DELETE') {
+                    // Delete event title
+                    const eventTitles = JSON.parse(localStorage.getItem('eventTitles') || '[]');
+                    const eventTitleId = parseInt(url.split('/').pop());
+                    const filteredEventTitles = eventTitles.filter(et => et.id !== eventTitleId);
+                    localStorage.setItem('eventTitles', JSON.stringify(filteredEventTitles));
+                    return { success: true };
+                } else {
+                    // Get event titles
+                    const eventTitles = JSON.parse(localStorage.getItem('eventTitles') || '[]');
+                    if (eventTitles.length === 0) {
+                        const defaultEventTitles = [
+                            { id: 1, title: 'System Maintenance', created_at: new Date().toISOString() },
+                            { id: 2, title: 'Security Check', created_at: new Date().toISOString() },
+                            { id: 3, title: 'Equipment Inspection', created_at: new Date().toISOString() }
+                        ];
+                        localStorage.setItem('eventTitles', JSON.stringify(defaultEventTitles));
+                        return defaultEventTitles;
+                    }
+                    return eventTitles;
+                }
+            }
+            return [];
+        }
+
+        // Notification System
+        function showNotification(type, message, duration = 5000) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation-circle'
+            };
+            
+            const colors = {
+                success: 'from-emerald-500 to-teal-600',
+                error: 'from-red-500 to-red-600',
+                info: 'from-blue-500 to-indigo-600',
+                warning: 'from-amber-500 to-orange-600'
+            };
+            
+            notification.className = `notification bg-gradient-to-r ${colors[type]} text-white p-4 rounded-2xl shadow-2xl max-w-sm`;
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <i class="${icons[type]} text-xl mt-1"></i>
+                    <div class="flex-1">
+                        <p class="font-semibold text-sm">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Trigger show animation
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // Initialize Application
+        window.addEventListener('load', async function() {
+            try {
+                await checkAuthentication();
+                await loadInitialData();
+                setupEventListeners();
+                showNotification('success', 'Admin panel loaded successfully!');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showNotification('error', 'Failed to initialize admin panel');
+            }
+        });
+
+        // Authentication Check
+        async function checkAuthentication() {
+            try {
+                // Try to get current user from API
+                const userData = await apiRequest(API_ENDPOINTS.auth.me);
+                currentUser = userData;
+                
+                // Check if user is admin
+                if (currentUser.role !== 'admin') {
+                    showNotification('error', 'Access denied. Admin privileges required.');
+                    setTimeout(() => window.location.href = '/static/reports-list.html', 2000);
+                    return;
+                }
+                
+                // Update user info display
+                const userInfo = document.getElementById('userInfo');
+                userInfo.innerHTML = `
+                    <i class="fas fa-user-shield mr-2 text-lg text-red-400"></i>
+                    <span>${currentUser.full_name || currentUser.username || 'Admin'}</span>
+                `;
+                
+            } catch (error) {
+                console.error('Authentication error:', error);
+                
+                // Fallback: Check localStorage for demo
+                const storedUser = localStorage.getItem('currentUser');
+                if (storedUser) {
+                    currentUser = JSON.parse(storedUser);
+                } else {
+                    // Set default admin user for demo
+                    currentUser = {
+                        id: 1,
+                        username: 'admin',
+                        full_name: 'System Administrator',
+                        email: 'admin@example.com',
+                        role: 'admin'
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+                
+                // Check if user is admin
+                if (currentUser.role !== 'admin') {
+                    showNotification('error', 'Access denied. Admin privileges required.');
+                    setTimeout(() => window.location.href = '/static/reports-list.html', 2000);
+                    return;
+                }
+                
+                const userInfo = document.getElementById('userInfo');
+                userInfo.innerHTML = `
+                    <i class="fas fa-user-shield mr-2 text-lg text-red-400"></i>
+                    <span>${currentUser.full_name || currentUser.username || 'Admin'}</span>
+                `;
+                
+                showNotification('warning', 'Running in demo mode - API connection failed');
+            }
+        }
+
+        // Load Initial Data
+        async function loadInitialData() {
+            await Promise.all([
+                loadUsers(),
+                loadShifts(),
+                loadReportsStats(),
+                loadEventTitles()
+            ]);
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Add User Form
+            document.getElementById('addUserForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await addUser();
+            });
+
+            // Add Shift Form
+            document.getElementById('addShiftForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await addShift();
+            });
+
+            // Edit User Form
+            document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await updateUser();
+            });
+
+            // Edit Shift Form
+            document.getElementById('editShiftForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await updateShift();
+            });
+
+            // Add Event Title Form
+            document.getElementById('addEventTitleForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await addEventTitle();
+            });
+
+            // Edit Event Title Form
+            document.getElementById('editEventTitleForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await updateEventTitle();
+            });
+
+            // Close modals when clicking outside
+            document.getElementById('editUserModal').addEventListener('click', function(e) {
+                if (e.target === this) closeEditUserModal();
+            });
+
+            document.getElementById('editShiftModal').addEventListener('click', function(e) {
+                if (e.target === this) closeEditShiftModal();
+            });
+
+            document.getElementById('editEventTitleModal').addEventListener('click', function(e) {
+                if (e.target === this) closeEditEventTitleModal();
+            });
+
+            document.getElementById('deleteModal').addEventListener('click', function(e) {
+                if (e.target === this) closeDeleteModal();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeEditUserModal();
+                    closeEditShiftModal();
+                    closeDeleteModal();
+                }
+            });
+        }
+
+        // Tab Management
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            currentTab = tabName;
+
+            // Load data if needed
+            if (tabName === 'reports') {
+                loadReportsStats();
+            }
+        }
+
+        // Users Management
+        async function loadUsers() {
+            try {
+                document.getElementById('usersLoading').style.display = 'block';
+                
+                const users = await apiRequest(API_ENDPOINTS.users.list);
+                
+                displayUsers(users);
+                document.getElementById('usersCount').textContent = users.length;
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('error', 'Failed to load users');
+            } finally {
+                document.getElementById('usersLoading').style.display = 'none';
+            }
+        }
+
+        function displayUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = users.map(user => `
+                <tr class="table-row">
+                    <td class="px-6 py-4 font-semibold">${user.username}</td>
+                    <td class="px-6 py-4">${user.full_name || 'N/A'}</td>
+                    <td class="px-6 py-4">
+                        <span class="status-badge ${user.role === 'admin' ? 'status-admin' : 'status-user'}">
+                            ${user.role}
+                        </span>
+                    </td>
+                    
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex justify-center space-x-2">
+                            <button onclick="editUser(${user.id})" class="action-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-1">
+                                <i class="fas fa-edit text-sm"></i>
+                                <span class="text-xs">Edit</span>
+                            </button>
+                            ${user.id !== currentUser.id ? `
+                                <button onclick="deleteUser(${user.id}, '${user.username}')" class="action-button bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-1">
+                                    <i class="fas fa-trash text-sm"></i>
+                                    <span class="text-xs">Delete</span>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function addUser() {
+            try {
+                const userData = {
+                    username: document.getElementById('newUsername').value,
+                    full_name: document.getElementById('newFullName').value,
+                    email: document.getElementById('newEmail').value,
+                    password: document.getElementById('newPassword').value,
+                    role: document.getElementById('newRole').value
+                };
+
+                // Validate input
+                if (!userData.username || !userData.full_name || !userData.email || !userData.password || !userData.role) {
+                    showNotification('error', 'Please fill in all fields');
+                    return;
+                }
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(userData.email)) {
+                    showNotification('error', 'Please enter a valid email address');
+                    return;
+                }
+
+                const newUser = await apiRequest(API_ENDPOINTS.users.create, {
+                    method: 'POST',
+                    body: JSON.stringify(userData)
+                });
+
+                showNotification('success', `User "${userData.username}" created successfully!`);
+                document.getElementById('addUserForm').reset();
+                await loadUsers();
+                
+            } catch (error) {
+                console.error('Error adding user:', error);
+                showNotification('error', error.message || 'Error while creating user');
+            }
+        }
+
+        async function editUser(userId) {
+            try {
+                const users = await apiRequest(API_ENDPOINTS.users.list);
+                const user = users.find(u => u.id === userId);
+                
+                if (user) {
+                    document.getElementById('editUserId').value = user.id;
+                    document.getElementById('editUsername').value = user.username;
+                    document.getElementById('editFullName').value = user.full_name || '';
+                    document.getElementById('editEmail').value = user.email || '';
+                    document.getElementById('editPassword').value = '';
+                    document.getElementById('editRole').value = user.role;
+                    
+                    document.getElementById('editUserModal').classList.remove('hidden');
+                } else {
+                    showNotification('error', 'User not found');
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+                showNotification('error', 'Error while loading user');
+            }
+        }
+
+        async function updateUser() {
+            try {
+                const userId = parseInt(document.getElementById('editUserId').value);
+                const userData = {
+                    username: document.getElementById('editUsername').value,
+                    full_name: document.getElementById('editFullName').value,
+                    email: document.getElementById('editEmail').value,
+                    role: document.getElementById('editRole').value
+                };
+
+                const password = document.getElementById('editPassword').value;
+                if (password) {
+                    userData.password = password;
+                }
+
+                // Validate input
+                if (!userData.username || !userData.full_name || !userData.email || !userData.role) {
+                    showNotification('error', 'Please fill in all required fields');
+                    return;
+                }
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(userData.email)) {
+                    showNotification('error', 'Please enter a valid email address');
+                    return;
+                }
+
+                await apiRequest(API_ENDPOINTS.users.update(userId), {
+                    method: 'PUT',
+                    body: JSON.stringify(userData)
+                });
+
+                showNotification('success', `User "${userData.username}" updated successfully!`);
+                closeEditUserModal();
+                await loadUsers();
+                
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showNotification('error', error.message || 'Error while updating user');
+            }
+        }
+
+        function deleteUser(userId, username) {
+            showDeleteModal(
+                `Are you sure you want to delete user "${username}"? This will also delete all their reports.`,
+                async () => {
+                    try {
+                        await apiRequest(API_ENDPOINTS.users.delete(userId), {
+                            method: 'DELETE'
+                        });
+                        
+                        showNotification('success', `User "${username}" deleted successfully!`);
+                        await loadUsers();
+                        
+                    } catch (error) {
+                        console.error('Error deleting user:', error);
+                        showNotification('error', error.message || 'Error while deleting user');
+                    }
+                }
+            );
+        }
+
+        // Shifts Management
+        async function loadShifts() {
+            try {
+                document.getElementById('shiftsLoading').style.display = 'block';
+                
+                const shifts = await apiRequest(API_ENDPOINTS.shifts.list);
+                
+                displayShifts(shifts);
+                document.getElementById('shiftsCount').textContent = shifts.length;
+                
+            } catch (error) {
+                console.error('Error loading shifts:', error);
+                showNotification('error', 'Failed to load shifts');
+            } finally {
+                document.getElementById('shiftsLoading').style.display = 'none';
+            }
+        }
+
+        function displayShifts(shifts) {
+            const tbody = document.getElementById('shiftsTableBody');
+            tbody.innerHTML = shifts.map(shift => `
+                <tr class="table-row">
+                    
+                    <td class="px-6 py-4 font-semibold">${shift.name}</td>
+                    <td class="px-6 py-4">${formatTime(shift.start_time)}</td>
+                    <td class="px-6 py-4">${formatTime(shift.end_time)}</td>
+                   
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex justify-center space-x-2">
+                            <button onclick="editShift(${shift.id})" class="action-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-1">
+                                <i class="fas fa-edit text-sm"></i>
+                                <span class="text-xs">Edit</span>
+                            </button>
+                            <button onclick="deleteShift(${shift.id}, '${shift.name}')" class="action-button bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-1">
+                                <i class="fas fa-trash text-sm"></i>
+                                <span class="text-xs">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function addShift() {
+            try {
+                const shiftData = {
+                    name: document.getElementById('newShiftName').value,
+                    start_time: document.getElementById('newStartTime').value,
+                    end_time: document.getElementById('newEndTime').value
+                };
+
+                // Validate input
+                if (!shiftData.name || !shiftData.start_time || !shiftData.end_time) {
+                    showNotification('error', 'Please fill in all fields');
+                    return;
+                }
+
+                const newShift = await apiRequest(API_ENDPOINTS.shifts.create, {
+                    method: 'POST',
+                    body: JSON.stringify(shiftData)
+                });
+
+                showNotification('success', `Shift "${shiftData.name}" created successfully!`);
+                document.getElementById('addShiftForm').reset();
+                await loadShifts();
+                
+            } catch (error) {
+                console.error('Error adding shift:', error);
+                showNotification('error', error.message || 'Error while creating shift');
+            }
+        }
+
+        async function editShift(shiftId) {
+            try {
+                const shifts = await apiRequest(API_ENDPOINTS.shifts.list);
+                const shift = shifts.find(s => s.id === shiftId);
+                
+                if (shift) {
+                    document.getElementById('editShiftId').value = shift.id;
+                    document.getElementById('editShiftName').value = shift.name;
+                    document.getElementById('editStartTime').value = shift.start_time;
+                    document.getElementById('editEndTime').value = shift.end_time;
+                    
+                    document.getElementById('editShiftModal').classList.remove('hidden');
+                } else {
+                    showNotification('error', 'Shift not found');
+                }
+            } catch (error) {
+                console.error('Error loading shift:', error);
+                showNotification('error', 'Error while loading shift');
+            }
+        }
+
+        async function updateShift() {
+            try {
+                const shiftId = parseInt(document.getElementById('editShiftId').value);
+                const shiftData = {
+                    name: document.getElementById('editShiftName').value,
+                    start_time: document.getElementById('editStartTime').value,
+                    end_time: document.getElementById('editEndTime').value
+                };
+
+                // Validate input
+                if (!shiftData.name || !shiftData.start_time || !shiftData.end_time) {
+                    showNotification('error', 'Please fill in all fields');
+                    return;
+                }
+
+                await apiRequest(API_ENDPOINTS.shifts.update(shiftId), {
+                    method: 'PUT',
+                    body: JSON.stringify(shiftData)
+                });
+
+                showNotification('success', `Shift "${shiftData.name}" updated successfully!`);
+                closeEditShiftModal();
+                await loadShifts();
+                
+            } catch (error) {
+                console.error('Error updating shift:', error);
+                showNotification('error', error.message || 'Error while updating shift');
+            }
+        }
+
+        function deleteShift(shiftId, shiftName) {
+            showDeleteModal(
+                `Are you sure you want to delete shift "${shiftName}"?`,
+                async () => {
+                    try {
+                        await apiRequest(API_ENDPOINTS.shifts.delete(shiftId), {
+                            method: 'DELETE'
+                        });
+                        
+                        showNotification('success', `Shift "${shiftName}" deleted successfully!`);
+                        await loadShifts();
+                        
+                    } catch (error) {
+                        console.error('Error deleting shift:', error);
+                        showNotification('error', error.message || 'Error while deleting shift');
+                    }
+                }
+            );
+        }
+
+        // Modal Management
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').classList.add('hidden');
+        }
+
+        function closeEditShiftModal() {
+            document.getElementById('editShiftModal').classList.add('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        function showDeleteModal(message, callback) {
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteMessage').textContent = message;
+            deleteCallback = callback;
+        }
+
+        // Confirm delete
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (deleteCallback) {
+                await deleteCallback();
+                closeDeleteModal();
+            }
+        });
+
+        // Utility Functions
+                // Validate input
+                if (!shiftData.name || !shiftData.start_time || !shiftData.end_time) {
+                    showNotification('error', 'Please fill in all fields');
+                    return;
+                }
+
+                const newShift = await apiRequest(API_ENDPOINTS.shifts.create, {
+                    method: 'POST',
+                    body: JSON.stringify(shiftData)
+                });
+
+                showNotification('success', `Shift "${shiftData.name}" created successfully!`);
+                document.getElementById('addShiftForm').reset();
+                await loadShifts();
+                
+            } catch (error) {
+                console.error('Error adding shift:', error);
+                showNotification('error', error.message || 'Error while creating shift');
+            }
+        }
+
+        async function editShift(shiftId) {
+            try {
+                const shifts = await apiRequest(API_ENDPOINTS.shifts.list);
+                const shift = shifts.find(s => s.id === shiftId);
+                
+                if (shift) {
+                    document.getElementById('editShiftId').value = shift.id;
+                    document.getElementById('editShiftName').value = shift.name;
+                    document.getElementById('editStartTime').value = shift.start_time;
+                    document.getElementById('editEndTime').value = shift.end_time;
+                    
+                    document.getElementById('editShiftModal').classList.remove('hidden');
+                } else {
+                    showNotification('error', 'Shift not found');
+                }
+            } catch (error) {
+                console.error('Error loading shift:', error);
+                showNotification('error', 'Error while loading shift');
+            }
+        }
+
+        async function updateShift() {
+            try {
+                const shiftId = parseInt(document.getElementById('editShiftId').value);
+                const shiftData = {
+                    name: document.getElementById('editShiftName').value,
+                    start_time: document.getElementById('editStartTime').value,
+                    end_time: document.getElementById('editEndTime').value
+                };
+
+                // Validate input
+                if (!shiftData.name || !shiftData.start_time || !shiftData.end_time) {
+                    showNotification('error', 'Please fill in all required fields');
+                    return;
+                }
+
+                await apiRequest(API_ENDPOINTS.shifts.update(shiftId), {
+                    method: 'PUT',
+                    body: JSON.stringify(shiftData)
+                });
+
+                showNotification('success', `Shift "${shiftData.name}" updated successfully!`);
+                closeEditShiftModal();
+                await loadShifts();
+                
+            } catch (error) {
+                console.error('Error updating shift:', error);
+                showNotification('error', error.message || 'Error while updating shift');
+            }
+        }
+
+        function deleteShift(shiftId, shiftName) {
+            showDeleteModal(
+                `Are you sure you want to delete shift "${shiftName}"? This may affect existing reports.`,
+                async () => {
+                    try {
+                        await apiRequest(API_ENDPOINTS.shifts.delete(shiftId), {
+                            method: 'DELETE'
+                        });
+                        
+                        showNotification('success', `Shift "${shiftName}" deleted successfully!`);
+                        await loadShifts();
+                        
+                    } catch (error) {
+                        console.error('Error deleting shift:', error);
+                        showNotification('error', error.message || 'Error while deleting shift');
+                    }
+                }
+            );
+        }
+
+        // Event Titles Management
+        async function loadEventTitles() {
+            try {
+                document.getElementById('eventTitlesLoading').style.display = 'block';
+                
+                const eventTitles = await apiRequest(API_ENDPOINTS.eventtitles.list);
+                
+                displayEventTitles(eventTitles);
+                document.getElementById('eventTitlesCount').textContent = eventTitles.length;
+                
+            } catch (error) {
+                console.error('Error loading event titles:', error);
+                showNotification('error', 'Failed to load event titles');
+            } finally {
+                document.getElementById('eventTitlesLoading').style.display = 'none';
+            }
+        }
+
+        function displayEventTitles(eventTitles) {
+            const tbody = document.getElementById('eventTitlesTableBody');
+            tbody.innerHTML = eventTitles.map(eventTitle => `
+                <tr class="table-row">
+                    <td class="px-6 py-4 font-mono">${eventTitle.id}</td>
+                    <td class="px-6 py-4 font-semibold">${eventTitle.title}</td>
+                    <td class="px-6 py-4 text-gray-300">${formatDate(eventTitle.created_at)}</td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex justify-center space-x-2">
+                            <button onclick="editEventTitle(${eventTitle.id})" class="action-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-1">
+                                <i class="fas fa-edit text-sm"></i>
+                                <span class="text-xs">Edit</span>
+                            </button>
+                            <button onclick="deleteEventTitle(${eventTitle.id}, '${eventTitle.title}')" class="action-button bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-1">
+                                <i class="fas fa-trash text-sm"></i>
+                                <span class="text-xs">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function addEventTitle() {
+            try {
+                const eventTitleData = {
+                    title: document.getElementById('newEventTitle').value
+                };
+
+                // Validate input
+                if (!eventTitleData.title) {
+                    showNotification('error', 'Please enter an event title');
+                    return;
+                }
+
+                const newEventTitle = await apiRequest(API_ENDPOINTS.eventtitles.create, {
+                    method: 'POST',
+                    body: JSON.stringify(eventTitleData)
+                });
+
+                showNotification('success', `Event title "${eventTitleData.title}" created successfully!`);
+                document.getElementById('addEventTitleForm').reset();
+                await loadEventTitles();
+                
+            } catch (error) {
+                console.error('Error adding event title:', error);
+                showNotification('error', error.message || 'Error while creating event title');
+            }
+        }
+
+        async function editEventTitle(eventTitleId) {
+            try {
+                const eventTitles = await apiRequest(API_ENDPOINTS.eventtitles.list);
+                const eventTitle = eventTitles.find(et => et.id === eventTitleId);
+                
+                if (eventTitle) {
+                    document.getElementById('editEventTitleId').value = eventTitle.id;
+                    document.getElementById('editEventTitleText').value = eventTitle.title;
+                    
+                    document.getElementById('editEventTitleModal').classList.remove('hidden');
+                } else {
+                    showNotification('error', 'Event title not found');
+                }
+            } catch (error) {
+                console.error('Error loading event title:', error);
+                showNotification('error', 'Error while loading event title');
+            }
+        }
+
+        async function updateEventTitle() {
+            try {
+                const eventTitleId = parseInt(document.getElementById('editEventTitleId').value);
+                const eventTitleData = {
+                    title: document.getElementById('editEventTitleText').value
+                };
+
+                // Validate input
+                if (!eventTitleData.title) {
+                    showNotification('error', 'Please enter an event title');
+                    return;
+                }
+
+                await apiRequest(API_ENDPOINTS.eventtitles.update(eventTitleId), {
+                    method: 'PUT',
+                    body: JSON.stringify(eventTitleData)
+                });
+
+                showNotification('success', `Event title updated successfully!`);
+                closeEditEventTitleModal();
+                await loadEventTitles();
+                
+            } catch (error) {
+                console.error('Error updating event title:', error);
+                showNotification('error', error.message || 'Error while updating event title');
+            }
+        }
+
+        function deleteEventTitle(eventTitleId, eventTitle) {
+            showDeleteModal(
+                `Are you sure you want to delete event title "${eventTitle}"?`,
+                async () => {
+                    try {
+                        await apiRequest(API_ENDPOINTS.eventtitles.delete(eventTitleId), {
+                            method: 'DELETE'
+                        });
+                        
+                        showNotification('success', `Event title "${eventTitle}" deleted successfully!`);
+                        await loadEventTitles();
+                        
+                    } catch (error) {
+                        console.error('Error deleting event title:', error);
+                        showNotification('error', error.message || 'Error while deleting event title');
+                    }
+                }
+            );
+        }
+
+        // Modal Management for Event Titles
+        function closeEditEventTitleModal() {
+            document.getElementById('editEventTitleModal').classList.add('hidden');
+        }
+
+        // Reports Statistics
+        async function loadReportsStats() {
+            try {
+                document.getElementById('reportsLoading').style.display = 'block';
+                
+                const reports = await apiRequest(API_ENDPOINTS.reports.list);
+                
+                // Calculate statistics
+                const totalReports = reports.length;
+                const reportsWithRCA = reports.filter(r => r.rca && r.rca.trim() !== '').length;
+                const healthCheckReports = reports.filter(r => 
+                    r.event_title?.toLowerCase().includes('health') || 
+                    r.event_description?.toLowerCase().includes('health')
+                ).length;
+                
+                const today = new Date().toISOString().split('T')[0];
+                const todayReports = reports.filter(r => r.report_date === today).length;
+                
+                // Update statistics
+                document.getElementById('totalReports').textContent = totalReports;
+                document.getElementById('reportsWithRCA').textContent = reportsWithRCA;
+                document.getElementById('healthCheckReports').textContent = healthCheckReports;
+                document.getElementById('todayReports').textContent = todayReports;
+                
+                // Display recent reports (last 10)
+                const recentReports = reports.slice(0, 10);
+                displayRecentReports(recentReports);
+                
+            } catch (error) {
+                console.error('Error loading reports stats:', error);
+                showNotification('error', 'Failed to load reports statistics');
+            } finally {
+                document.getElementById('reportsLoading').style.display = 'none';
+            }
+        }
+
+        function displayRecentReports(reports) {
+            const tbody = document.getElementById('recentReportsTableBody');
+            tbody.innerHTML = reports.map(report => {
+                const hasRca = report.rca && report.rca.trim() !== '';
+                const isHealthCheck = report.event_title?.toLowerCase().includes('health') || 
+                                     report.event_description?.toLowerCase().includes('health');
+                
+                let statusClass, statusText;
+                if (hasRca) {
+                    statusClass = 'status-admin';
+                    statusText = 'With RCA';
+                } else if (isHealthCheck) {
+                    statusClass = 'status-user';
+                    statusText = 'Health Check';
+                } else {
+                    statusClass = 'bg-yellow-500';
+                    statusText = 'Without RCA';
+                }
+                
+                return `
+                    <tr class="table-row">
+                        <td class="px-6 py-4 font-mono">${report.id}</td>
+                        <td class="px-6 py-4 font-semibold">${report.event_title || 'Untitled'}</td>
+                        <td class="px-6 py-4">${report.full_name || report.username || 'Unknown'}</td>
+                        <td class="px-6 py-4 text-gray-300">${formatDate(report.report_date)}</td>
+                        <td class="px-6 py-4">
+                            <span class="status-badge ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <a href="/static/reports-list.html" class="action-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-1 inline-flex">
+                                <i class="fas fa-eye text-sm"></i>
+                                <span class="text-xs">View</span>
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Modal Management
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').classList.add('hidden');
+        }
+
+        function closeEditShiftModal() {
+            document.getElementById('editShiftModal').classList.add('hidden');
+        }
+
+        function showDeleteModal(message, callback) {
+            document.getElementById('deleteMessage').textContent = message;
+            deleteCallback = callback;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            deleteCallback = null;
+        }
+
+        // Confirm delete
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (deleteCallback) {
+                await deleteCallback();
+                closeDeleteModal();
+            }
+        });
+
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateTime(dateString) {
+            // If this is already in hh:mm format, return as is
+            if (dateString && dateString.match(/^\d{2}:\d{2}$/)) {
+                return dateString;
+            }
+            
+            // If it's a time-only string in HH:MM:SS format, extract HH:MM
+            if (dateString && dateString.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return dateString.substring(0, 5);
+            }
+            
+            // Otherwise, parse as a full date and extract time
+            const date = new Date(dateString);
+            
+            // Check if it's a valid date
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
+            
+            // Format as hh:mm
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        // New function to format time specifically
+        function formatTime(timeString) {
+            // If this is already in hh:mm format, return as is
+            if (timeString && timeString.match(/^\d{2}:\d{2}$/)) {
+                return timeString;
+            }
+            
+            // If it's a time-only string in HH:MM:SS format, extract HH:MM
+            if (timeString && timeString.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return timeString.substring(0, 5);
+            }
+            
+            // If it's a full datetime string, extract the time portion
+            if (timeString && timeString.includes('T')) {
+                const timePart = timeString.split('T')[1];
+                if (timePart) {
+                    // Remove the 'Z' at the end if present and extract HH:MM
+                    const cleanTime = timePart.replace('Z', '');
+                    if (cleanTime.match(/^\d{2}:\d{2}:\d{2}/)) {
+                        return cleanTime.substring(0, 5);
+                    }
+                }
+            }
+            
+            // Otherwise, try to parse as a full date and extract time
+            const date = new Date(timeString);
+            
+            // Check if it's a valid date
+            if (isNaN(date.getTime())) {
+                return timeString || 'N/A';
+            }
+            
+            // Format as hh:mm
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        function calculateDuration(startTime, endTime) {
+            const start = new Date(`2000-01-01 ${startTime}`);
+            const end = new Date(`2000-01-01 ${endTime}`);
+            
+            let diff = end - start;
+            if (diff < 0) {
+                // Handle overnight shifts
+                diff += 24 * 60 * 60 * 1000;
+            }
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            return `${hours}h ${minutes}m`;
+        }
+
+        // Logout Function
+        async function logout() {
+            try {
+                await apiRequest(API_ENDPOINTS.auth.logout, { method: 'POST' });
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                showNotification('success', 'Logged out successfully!');
+                setTimeout(() => {
+                    window.location.href = '/static/login.html';
+                }, 1000);
+            } catch (error) {
+                // Even if API fails, clear local data and redirect
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                window.location.href = '/static/login.html';
+            }
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9853dddcf629d9d3',t:'MTc1ODkwMTI5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

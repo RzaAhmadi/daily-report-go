@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Report Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in { animation: slideIn 0.5s ease-out; }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6); }
+        }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                  
+                       
+                   
+
+                   <a href="/" target="_blank" rel="noopener noreferrer">
+  <img src="200.png" alt="لوگوی شرکت" width="100" height="auto">
+</a>
+ 
+                    <h1 class="text-2xl font-bold text-white">Daily Report System</h1>
+                     
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white/10 px-4 py-2 rounded-lg">
+                        <span id="userInfo" class="text-white font-medium"></span>
+                    </div>
+                    <a href="/static/reports-list.html" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center">
+                        <i class="fas fa-list mr-2"></i>View Reports
+                    </a>
+                    <a href="/static/admin.html" id="adminLink" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition duration-200 hidden flex items-center">
+                        <i class="fas fa-cog mr-2"></i>Admin
+                    </a>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-200 flex items-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto p-6">
+        <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 slide-in">
+            <div class="text-center mb-8">
+         
+                
+                <h2 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">Daily Report Registration</h2>
+                <p class="text-gray-600 text-lg">Fill out your daily report with all required information</p>
+            </div>
+            
+            <form id="reportForm" class="space-y-8">
+                <!-- Part 1: Basic Information -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-6 flex items-center">
+                        <i class="fas fa-info-circle mr-3 text-blue-600"></i>
+                        Basic Information
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>Report Date *
+                            </label>
+                            <input type="date" id="reportDate" required
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <i class="fas fa-clock mr-2 text-blue-500"></i>Shift Hours
+                            </label>
+                            <select id="shiftHours" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white">
+                                <option value="">Select Shift Hours</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-users mr-2 text-blue-500"></i>Shift Managers *
+                        </label>
+                        <!-- Search box for Shift Managers -->
+                        <div class="mb-3">
+                            <input type="text" id="shiftManagersSearch" placeholder="Search shift managers..." 
+                                   class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                   oninput="filterShiftManagers()">
+                        </div>
+                        <div id="shiftManagers" class="space-y-2 max-h-40 overflow-y-auto bg-white border-2 border-gray-200 rounded-xl p-4">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <!-- Selected managers display -->
+                        <div id="selectedManagers" class="mt-3 flex flex-wrap gap-2">
+                            <!-- Selected managers will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 2: Health Checks -->
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border-l-4 border-green-500">
+                    <h3 class="text-2xl font-semibold text-green-800 mb-6 flex items-center">
+                        <i class="fas fa-heartbeat mr-3 text-green-600"></i>
+                       System Health Checks
+                    </h3>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-tags mr-2 text-green-500"></i>Event Titles *
+                        </label>
+                        <!-- Search box for Event Titles -->
+                        <div class="mb-3">
+                            <input type="text" id="eventTitlesSearch" placeholder="Search event titles..." 
+                                   class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
+                                   oninput="filterEventTitles()">
+                        </div>
+                        <div id="eventTitles" class="space-y-2 max-h-40 overflow-y-auto bg-white border-2 border-gray-200 rounded-xl p-4">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <!-- Selected titles display -->
+                        <div id="selectedTitles" class="mt-3 flex flex-wrap gap-2">
+                            <!-- Selected titles will appear here -->
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label class="flex items-center p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-green-300 transition duration-200 cursor-pointer">
+                            <input type="checkbox" id="healthPower" class="mr-3 h-5 w-5 text-green-600 rounded">
+                            <div>
+                                <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-700">Power Sources Health</span>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-green-300 transition duration-200 cursor-pointer">
+                            <input type="checkbox" id="healthHumidity" class="mr-3 h-5 w-5 text-green-600 rounded">
+                            <div>
+                                <i class="fas fa-thermometer-half text-blue-500 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-700">Humidity & Temperature</span>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-green-300 transition duration-200 cursor-pointer">
+                            <input type="checkbox" id="healthFire" class="mr-3 h-5 w-5 text-green-600 rounded">
+                            <div>
+                                <i class="fas fa-fire-extinguisher text-red-500 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-700">Fire Extinguishing System</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Part 3: Events with RCA -->
+                <div class="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-2xl border-l-4 border-orange-500">
+                    <h3 class="text-2xl font-semibold text-orange-800 mb-6 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3 text-orange-600"></i>
+                        Needed RCA Events
+                    </h3>
+                    <div id="eventsPart3Container">
+                        <!-- Dynamic events will be added here -->
+                    </div>
+                    <button type="button" onclick="addEventPart3()" 
+                            class="mt-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl transition duration-200 flex items-center shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>Add Event
+                    </button>
+                </div>
+
+                <!-- Part 4: Events without RCA -->
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                    <h3 class="text-2xl font-semibold text-purple-800 mb-6 flex items-center">
+                        <i class="fas fa-clipboard-check mr-3 text-purple-600"></i>
+                        Don't Needed RCA Events
+                    </h3>
+                    <div id="eventsPart4Container">
+                        <!-- Dynamic events will be added here -->
+                    </div>
+                    <button type="button" onclick="addEventPart4()" 
+                            class="mt-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-xl transition duration-200 flex items-center shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>Add Event
+                    </button>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6 text-center">
+                    <button type="submit" 
+                            class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-12 rounded-2xl transition duration-200 transform hover:scale-105 shadow-2xl text-lg">
+                        <i class="fas fa-paper-plane mr-3"></i>Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        let currentUser = null;
+        let eventPart3Counter = 0;
+        let eventPart4Counter = 0;
+
+        function showNotification(type, message, duration = 5000) {
+            const container = document.getElementById('messageContainer');
+            const notification = document.createElement('div');
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation-circle'
+            };
+            
+            const colors = {
+                success: 'from-green-400 to-green-600',
+                error: 'from-red-400 to-red-600',
+                info: 'from-blue-400 to-blue-600',
+                warning: 'from-yellow-400 to-orange-500'
+            };
+            
+            notification.className = `bg-gradient-to-r ${colors[type]} text-white p-4 rounded-xl shadow-2xl transform transition-all duration-300 slide-in max-w-sm`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="${icons[type]} text-xl mr-3"></i>
+                    <span class="font-medium">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // Check authentication and load user info
+        window.addEventListener('load', async function() {
+            try {
+                const response = await fetch('/api/check-auth');
+                if (response.ok) {
+                    currentUser = await response.json();
+                    document.getElementById('userInfo').innerHTML = `<i class="fas fa-user mr-2"></i>${currentUser.full_name}`;
+                    
+                    if (currentUser.role === 'admin') {
+                        document.getElementById('adminLink').classList.remove('hidden');
+                    }
+                    
+                    await loadFormData();
+                    
+                    // Check if we're editing an existing report
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const editId = urlParams.get('edit');
+                    if (editId) {
+                        await loadReportForEditing(editId);
+                    }
+                    
+                    showNotification('success', 'Welcome! Form loaded successfully.');
+                } else {
+                    window.location.href = '/static/login.html';
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showNotification('error', 'Authentication failed. Redirecting to login...');
+                setTimeout(() => window.location.href = '/static/login.html', 2000);
+            }
+        });
+
+        // New function to format time specifically
+        function formatTime(timeString) {
+            // If this is already in hh:mm format, return as is
+            if (timeString && timeString.match(/^\d{2}:\d{2}$/)) {
+                return timeString;
+            }
+            
+            // If it's a time-only string in HH:MM:SS format, extract HH:MM
+            if (timeString && timeString.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return timeString.substring(0, 5);
+            }
+            
+            // If it's a full datetime string, extract the time portion
+            if (timeString && timeString.includes('T')) {
+                const timePart = timeString.split('T')[1];
+                if (timePart) {
+                    // Remove the 'Z' at the end if present and extract HH:MM
+                    const cleanTime = timePart.replace('Z', '');
+                    if (cleanTime.match(/^\d{2}:\d{2}:\d{2}/)) {
+                        return cleanTime.substring(0, 5);
+                    }
+                }
+            }
+            
+            // Otherwise, try to parse as a full date and extract time
+            const date = new Date(timeString);
+            
+            // Check if it's a valid date
+            if (isNaN(date.getTime())) {
+                return timeString || 'N/A';
+            }
+            
+            // Format as hh:mm
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        // Function to filter shift managers based on search input
+        function filterShiftManagers() {
+            const searchInput = document.getElementById('shiftManagersSearch');
+            const filter = searchInput.value.toLowerCase();
+            const container = document.getElementById('shiftManagers');
+            
+            // Clear the container
+            container.innerHTML = '';
+            
+            // Filter and display matching users
+            originalUsers.forEach(user => {
+                const fullName = user.full_name.toLowerCase();
+                const username = user.username.toLowerCase();
+                
+                if (fullName.includes(filter) || username.includes(filter)) {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center p-2 hover:bg-blue-50 rounded-lg cursor-pointer transition duration-200';
+                    label.innerHTML = `
+                        <input type="checkbox" name="shiftManager" value="${user.id}" class="mr-3 h-4 w-4 text-blue-600 rounded" onchange="updateSelectedManagers()">
+                        <div class="flex items-center">
+                            <i class="fas fa-user-tie text-blue-500 mr-2"></i>
+                            <span class="text-sm text-gray-700 font-medium">${user.full_name}</span>
+                            <span class="text-xs text-gray-500 ml-2">(${user.username})</span>
+                        </div>
+                    `;
+                    
+                    // Check if this user is already selected in the form (across all instances)
+                    const existingCheckboxes = document.querySelectorAll(`input[name="shiftManager"][value="${user.id}"]`);
+                    // Use the checked state of any existing checkbox (from previous searches)
+                    const isChecked = Array.from(existingCheckboxes).some(cb => cb.checked);
+                    
+                    const newCheckbox = label.querySelector('input[name="shiftManager"]');
+                    newCheckbox.checked = isChecked;
+                    
+                    container.appendChild(label);
+                }
+            });
+            
+            // Update the display of selected managers
+            updateSelectedManagers();
+        }
+
+        // Function to filter event titles based on search input
+        function filterEventTitles() {
+            const searchInput = document.getElementById('eventTitlesSearch');
+            const filter = searchInput.value.toLowerCase();
+            const container = document.getElementById('eventTitles');
+            
+            // Clear the container
+            container.innerHTML = '';
+            
+            // Filter and display matching event titles
+            originalEventTitles.forEach(title => {
+                const titleText = title.title.toLowerCase();
+                
+                if (titleText.includes(filter)) {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center p-2 hover:bg-green-50 rounded-lg cursor-pointer transition duration-200';
+                    label.innerHTML = `
+                        <input type="checkbox" name="eventTitle" value="${title.id}" class="mr-3 h-4 w-4 text-green-600 rounded" onchange="updateSelectedTitles()">
+                        <div class="flex items-center">
+                            <i class="fas fa-tag text-green-500 mr-2"></i>
+                            <span class="text-sm text-gray-700 font-medium">${title.title}</span>
+                        </div>
+                    `;
+                    
+                    // Check if this title is already selected in the form (across all instances)
+                    const existingCheckboxes = document.querySelectorAll(`input[name="eventTitle"][value="${title.id}"]`);
+                    // Use the checked state of any existing checkbox (from previous searches)
+                    const isChecked = Array.from(existingCheckboxes).some(cb => cb.checked);
+                    
+                    const newCheckbox = label.querySelector('input[name="eventTitle"]');
+                    newCheckbox.checked = isChecked;
+                    
+                    container.appendChild(label);
+                }
+            });
+            
+            // Update the display of selected titles
+            updateSelectedTitles();
+        }
+
+        // Function to update selected managers display
+        function updateSelectedManagers() {
+            const selectedManagersContainer = document.getElementById('selectedManagers');
+            selectedManagersContainer.innerHTML = '';
+            
+            const checkboxes = document.querySelectorAll('input[name="shiftManager"]:checked');
+            checkboxes.forEach(checkbox => {
+                const label = checkbox.closest('label');
+                const fullName = label.querySelector('span.font-medium').textContent;
+                
+                const tag = document.createElement('span');
+                tag.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800';
+                tag.innerHTML = `
+                    ${fullName}
+                    <button type="button" class="ml-2 inline-flex items-center rounded-md bg-blue-200 text-blue-800 hover:bg-blue-300 focus:outline-none" onclick="deselectManager(${checkbox.value})">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                selectedManagersContainer.appendChild(tag);
+            });
+        }
+
+        // Function to deselect a manager
+        function deselectManager(userId) {
+            const checkbox = document.querySelector(`input[name="shiftManager"][value="${userId}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+                updateSelectedManagers();
+            }
+        }
+
+        // Function to update selected titles display
+        function updateSelectedTitles() {
+            const selectedTitlesContainer = document.getElementById('selectedTitles');
+            selectedTitlesContainer.innerHTML = '';
+            
+            const checkboxes = document.querySelectorAll('input[name="eventTitle"]:checked');
+            checkboxes.forEach(checkbox => {
+                const label = checkbox.closest('label');
+                const title = label.querySelector('span.font-medium').textContent;
+                
+                const tag = document.createElement('span');
+                tag.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+                tag.innerHTML = `
+                    ${title}
+                    <button type="button" class="ml-2 inline-flex items-center rounded-md bg-green-200 text-green-800 hover:bg-green-300 focus:outline-none" onclick="deselectTitle(${checkbox.value})">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                selectedTitlesContainer.appendChild(tag);
+            });
+        }
+
+        // Function to deselect a title
+        function deselectTitle(titleId) {
+            const checkbox = document.querySelector(`input[name="eventTitle"][value="${titleId}"]`);
+            if (checkbox) {
+                checkbox.checked = false;
+                updateSelectedTitles();
+            }
+        }
+
+        async function loadReportForEditing(reportId) {
+            try {
+                // Try to get report data from sessionStorage first
+                const editData = sessionStorage.getItem('editReportData');
+                let report;
+                
+                if (editData) {
+                    report = JSON.parse(editData);
+                } else {
+                    // Fallback to API call
+                    const response = await fetch(`/api/reports/${reportId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to load report data');
+                    }
+                    report = await response.json();
+                }
+                
+                // Pre-populate the form with report data
+                prepopulateForm(report);
+                
+                // Update form title
+                document.querySelector('h2').textContent = 'Edit Daily Report';
+                
+                // Store the report ID for submission
+                document.getElementById('reportForm').setAttribute('data-edit-id', reportId);
+                
+                showNotification('info', 'Editing existing report');
+            } catch (error) {
+                console.error('Error loading report for editing:', error);
+                showNotification('error', 'Failed to load report data for editing');
+            }
+        }
+
+        function prepopulateForm(report) {
+            // Debug: Log the entire report structure
+            console.log('Report data for prepopulation:', JSON.stringify(report, null, 2));
+            
+            // Set basic information
+            if (report.report_date) {
+                document.getElementById('reportDate').value = report.report_date;
+            }
+            
+            if (report.shift_hours && report.shift_hours.id) {
+                document.getElementById('shiftHours').value = report.shift_hours.id;
+            }
+            
+            // Set shift managers
+            if (report.shift_managers && report.shift_managers.length > 0) {
+                const managerCheckboxes = document.querySelectorAll('input[name="shiftManager"]');
+                managerCheckboxes.forEach(checkbox => {
+                    if (report.shift_managers.some(manager => manager.id === parseInt(checkbox.value))) {
+                        checkbox.checked = true;
+                    }
+                });
+                updateSelectedManagers();
+            }
+            
+            // Set event titles
+            if (report.event_titles && report.event_titles.length > 0) {
+                const titleCheckboxes = document.querySelectorAll('input[name="eventTitle"]');
+                titleCheckboxes.forEach(checkbox => {
+                    if (report.event_titles.some(title => title.id === parseInt(checkbox.value))) {
+                        checkbox.checked = true;
+                    }
+                });
+                updateSelectedTitles();
+            }
+            
+            // Set health checks
+            if (report.health_power_sources !== undefined) {
+                document.getElementById('healthPower').checked = report.health_power_sources;
+            }
+            
+            if (report.health_humidity_temp !== undefined) {
+                document.getElementById('healthHumidity').checked = report.health_humidity_temp;
+            }
+            
+            if (report.health_fire_system !== undefined) {
+                document.getElementById('healthFire').checked = report.health_fire_system;
+            }
+            
+            // Helper function to format datetime for time input
+            function formatTimeForInput(dateTimeString) {
+                // Handle empty or null values
+                if (!dateTimeString || dateTimeString === "0000-01-01T00:00:00Z" || dateTimeString === "1970-01-01 00:00:00") {
+                    return "";
+                }
+                
+                // If it's already in HH:MM format, return as is
+                if (dateTimeString.match(/^\d{2}:\d{2}$/)) {
+                    return dateTimeString;
+                }
+                
+                // Parse the datetime string
+                const date = new Date(dateTimeString);
+                
+                // Check if it's a valid date
+                if (isNaN(date.getTime())) {
+                    return "";
+                }
+                
+                // Format as HH:MM
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                
+                return `${hours}:${minutes}`;
+            }
+            
+            // Populate Part 3 events
+            if (report.events_part3 && report.events_part3.length > 0) {
+                report.events_part3.forEach((event, index) => {
+                    // Debug: Log each event
+                    console.log(`Part 3 Event ${index}:`, JSON.stringify(event, null, 2));
+                    
+                    addEventPart3();
+                    const eventDiv = document.getElementById(`eventPart3_${eventPart3Counter}`);
+                    if (eventDiv) {
+                        const summaryElement = eventDiv.querySelector('textarea[name="eventSummary3"]');
+                        const triggerElement = eventDiv.querySelector('textarea[name="trigger3"]');
+                        const startTimeElement = eventDiv.querySelector('input[name="startTime3"]');
+                        const endTimeElement = eventDiv.querySelector('input[name="endTime3"]');
+                        const rcaNumberElement = eventDiv.querySelector('input[name="rcaNumber"]');
+                        
+                        if (summaryElement && event.event_summary !== undefined) {
+                            summaryElement.value = event.event_summary || '';
+                        }
+                        
+                        // Handle both possible field names for trigger
+                        const triggerValue = event.trigger_info !== undefined ? event.trigger_info : 
+                                           (event.Trigger !== undefined ? event.Trigger : '');
+                        if (triggerElement) {
+                            triggerElement.value = triggerValue || '';
+                        }
+                        
+                        if (startTimeElement && event.start_time !== undefined) {
+                            startTimeElement.value = formatTimeForInput(event.start_time) || '';
+                        }
+                        
+                        if (endTimeElement && event.end_time !== undefined) {
+                            endTimeElement.value = formatTimeForInput(event.end_time) || '';
+                        }
+                        
+                        if (rcaNumberElement && event.rca_number !== undefined && event.rca_number !== null) {
+                            rcaNumberElement.value = event.rca_number;
+                        }
+                    }
+                });
+            }
+            
+            // Populate Part 4 events
+            if (report.events_part4 && report.events_part4.length > 0) {
+                report.events_part4.forEach((event, index) => {
+                    // Debug: Log each event
+                    console.log(`Part 4 Event ${index}:`, JSON.stringify(event, null, 2));
+                    
+                    addEventPart4();
+                    const eventDiv = document.getElementById(`eventPart4_${eventPart4Counter}`);
+                    if (eventDiv) {
+                        const summaryElement = eventDiv.querySelector('textarea[name="eventSummary4"]');
+                        const triggerElement = eventDiv.querySelector('textarea[name="trigger4"]');
+                        const startTimeElement = eventDiv.querySelector('input[name="startTime4"]');
+                        const endTimeElement = eventDiv.querySelector('input[name="endTime4"]');
+                        
+                        if (summaryElement && event.event_summary !== undefined) {
+                            summaryElement.value = event.event_summary || '';
+                        }
+                        
+                        // Handle both possible field names for trigger
+                        const triggerValue = event.trigger_info !== undefined ? event.trigger_info : 
+                                           (event.Trigger !== undefined ? event.Trigger : '');
+                        if (triggerElement) {
+                            triggerElement.value = triggerValue || '';
+                        }
+                        
+                        if (startTimeElement && event.start_time !== undefined) {
+                            startTimeElement.value = formatTimeForInput(event.start_time) || '';
+                        }
+                        
+                        if (endTimeElement && event.end_time !== undefined) {
+                            endTimeElement.value = formatTimeForInput(event.end_time) || '';
+                        }
+                    }
+                });
+            }
+        }
+
+        // Global variables to store original data for filtering
+        let originalUsers = [];
+        let originalEventTitles = [];
+
+        async function loadFormData() {
+            // Set today's date as default
+            document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+            
+            // Load shift hours
+            try {
+                const response = await fetch('/api/shift-hours');
+                if (response.ok) {
+                    const shiftHours = await response.json();
+                    const select = document.getElementById('shiftHours');
+                    
+                    shiftHours.forEach(shift => {
+                        const option = document.createElement('option');
+                        option.value = shift.id;
+                        option.textContent = `${shift.name} (${formatTime(shift.start_time)} - ${formatTime(shift.end_time)})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading shift hours:', error);
+                showNotification('error', 'Failed to load shift hours');
+            }
+
+            // Load users for shift managers
+            try {
+                const response = await fetch('/api/users');
+                if (response.ok) {
+                    const users = await response.json();
+                    originalUsers = users; // Store for filtering
+                    const container = document.getElementById('shiftManagers');
+                    
+                    users.forEach(user => {
+                        const label = document.createElement('label');
+                        label.className = 'flex items-center p-2 hover:bg-blue-50 rounded-lg cursor-pointer transition duration-200';
+                        label.innerHTML = `
+                            <input type="checkbox" name="shiftManager" value="${user.id}" class="mr-3 h-4 w-4 text-blue-600 rounded" onchange="updateSelectedManagers()">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-tie text-blue-500 mr-2"></i>
+                                <span class="text-sm text-gray-700 font-medium">${user.full_name}</span>
+                                <span class="text-xs text-gray-500 ml-2">(${user.username})</span>
+                            </div>
+                        `;
+                        container.appendChild(label);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('error', 'Failed to load users');
+            }
+
+            // Load event titles
+            try {
+                const response = await fetch('/api/event-titles');
+                if (response.ok) {
+                    const eventTitles = await response.json();
+                    originalEventTitles = eventTitles; // Store for filtering
+                    const container = document.getElementById('eventTitles');
+                    
+                    eventTitles.forEach(title => {
+                        const label = document.createElement('label');
+                        label.className = 'flex items-center p-2 hover:bg-green-50 rounded-lg cursor-pointer transition duration-200';
+                        label.innerHTML = `
+                            <input type="checkbox" name="eventTitle" value="${title.id}" class="mr-3 h-4 w-4 text-green-600 rounded" onchange="updateSelectedTitles()">
+                            <div class="flex items-center">
+                                <i class="fas fa-tag text-green-500 mr-2"></i>
+                                <span class="text-sm text-gray-700 font-medium">${title.title}</span>
+                            </div>
+                        `;
+                        container.appendChild(label);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading event titles:', error);
+                showNotification('error', 'Failed to load event titles');
+            }
+        }
+
+        function addEventPart3() {
+            eventPart3Counter++;
+            const container = document.getElementById('eventsPart3Container');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'bg-white border-2 border-orange-200 rounded-2xl p-6 mb-4 shadow-lg slide-in';
+            eventDiv.id = `eventPart3_${eventPart3Counter}`;
+            
+            eventDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-orange-800 text-lg flex items-center">
+                        <i class="fas fa-exclamation-circle text-orange-600 mr-2"></i>
+                        Event ${eventPart3Counter}
+                    </h4>
+                    <button type="button" onclick="removeEvent('eventPart3_${eventPart3Counter}')" 
+                            class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg text-sm transition duration-200 flex items-center">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                </div>
+                 <div class="md:col-span-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-align-left text-orange-500 mr-2"></i>Event Summary
+                        </label>
+                        <textarea name="eventSummary3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200" rows="2"></textarea>
+                  
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-play text-orange-500 mr-2"></i>Trigger
+                        </label>
+                        <textarea name="trigger3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200" rows="2"></textarea>
+                    </div>  </div>
+               
+               
+               
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+      <i class="fas fa-clock text-orange-500 mr-2"></i> Start Time
+    </label>
+    <input type="time" name="startTime3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200">
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+      <i class="fas fa-stop-circle text-orange-500 mr-2"></i> End Time
+    </label>
+    <input type="time" name="endTime3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200">
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+      <i class="fas fa-hashtag text-orange-500 mr-3"></i> RCA Number
+    </label>
+    <input type="text" name="rcaNumber" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200">
+  </div>
+</div>
+                
+            `;
+            
+            container.appendChild(eventDiv);
+            showNotification('info', `Event ${eventPart3Counter} added to Part 3`);
+        }
+
+        function addEventPart4() {
+            eventPart4Counter++;
+            const container = document.getElementById('eventsPart4Container');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'bg-white border-2 border-purple-200 rounded-2xl p-6 mb-4 shadow-lg slide-in';
+            eventDiv.id = `eventPart4_${eventPart4Counter}`;
+            
+            eventDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-purple-800 text-lg flex items-center">
+                        <i class="fas fa-clipboard-check text-purple-600 mr-2"></i>
+                        Event ${eventPart4Counter}
+                    </h4>
+                    <button type="button" onclick="removeEvent('eventPart4_${eventPart4Counter}')" 
+                            class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg text-sm transition duration-200 flex items-center">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                </div>
+                <div class="md:col-span-2">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-align-left text-purple-500 mr-2"></i>Event Summary
+                        </label>
+                        <textarea name="eventSummary4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" rows="2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-play text-purple-500 mr-2"></i>Trigger
+                        </label>
+                        <textarea name="trigger4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" rows="2"></textarea>
+                    </div>
+                    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-clock text-purple-500 mr-2"></i>Start Time
+                        </label>
+                        <input type="time" name="startTime4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-stop-circle text-purple-500 mr-2"></i>End Time
+                        </label>
+                        <input type="time" name="endTime4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200">
+                    </div>
+
+</div>
+
+                </div>
+            `;
+            
+            container.appendChild(eventDiv);
+            showNotification('info', `Event ${eventPart4Counter} added to Part 4`);
+        }
+
+        function removeEvent(eventId) {
+            const element = document.getElementById(eventId);
+            if (element) {
+                element.style.opacity = '0';
+                element.style.transform = 'translateX(-100%)';
+                setTimeout(() => element.remove(), 300);
+                showNotification('warning', 'Event removed');
+            }
+        }
+
+        // Form submission with enhanced error handling and debugging
+        document.getElementById('reportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            showNotification('info', 'Submitting report...');
+            
+            try {
+                // Check if we're editing an existing report
+                const editId = this.getAttribute('data-edit-id');
+                
+                // Collect basic form data
+                const reportDateElement = document.getElementById('reportDate');
+                const shiftHoursElement = document.getElementById('shiftHours');
+                
+                if (!reportDateElement || !shiftHoursElement) {
+                    throw new Error('Required form elements not found');
+                }
+                
+                const reportDate = reportDateElement.value.trim();
+                const shiftHoursValue = shiftHoursElement.value.trim();
+                
+                // Validate required fields
+                if (!reportDate) {
+                    showNotification('error', 'Report date is required');
+                    return;
+                }
+                
+                // Collect shift managers
+                const shiftManagerCheckboxes = document.querySelectorAll('input[name="shiftManager"]:checked');
+                const shiftManagerIds = Array.from(shiftManagerCheckboxes)
+                    .map(cb => parseInt(cb.value))
+                    .filter(id => !isNaN(id));
+                
+                if (shiftManagerIds.length === 0) {
+                    showNotification('error', 'At least one shift manager must be selected');
+                    return;
+                }
+                
+                // Collect event titles
+                const eventTitleCheckboxes = document.querySelectorAll('input[name="eventTitle"]:checked');
+                const eventTitleIds = Array.from(eventTitleCheckboxes)
+                    .map(cb => parseInt(cb.value))
+                    .filter(id => !isNaN(id));
+                
+                if (eventTitleIds.length === 0) {
+                    showNotification('error', 'At least one event title must be selected');
+                    return;
+                }
+                
+                // Collect health check data
+                const healthPowerElement = document.getElementById('healthPower');
+                const healthHumidityElement = document.getElementById('healthHumidity');
+                const healthFireElement = document.getElementById('healthFire');
+                
+                // Collect Part 3 events
+                const eventsPart3 = [];
+                const part3Containers = document.querySelectorAll('#eventsPart3Container > div');
+                part3Containers.forEach(eventDiv => {
+                    const summaryElement = eventDiv.querySelector('textarea[name="eventSummary3"]');
+                    const triggerElement = eventDiv.querySelector('textarea[name="trigger3"]');
+                    const startTimeElement = eventDiv.querySelector('input[name="startTime3"]');
+                    const endTimeElement = eventDiv.querySelector('input[name="endTime3"]');
+                    const rcaNumberElement = eventDiv.querySelector('input[name="rcaNumber"]');
+                    
+                    if (summaryElement || triggerElement) {
+                        const event = {
+                            event_summary: summaryElement ? summaryElement.value.trim() : '',
+                            trigger_info: triggerElement ? triggerElement.value.trim() : '',
+                            start_time: startTimeElement ? startTimeElement.value : '',
+                            end_time: endTimeElement ? endTimeElement.value : '',
+                            rca_number: rcaNumberElement ? rcaNumberElement.value.trim() : ''
+                        };
+                        
+                        if (event.event_summary || event.trigger) {
+                            eventsPart3.push(event);
+                        }
+                    }
+                });
+                
+                // Collect Part 4 events
+                const eventsPart4 = [];
+                const part4Containers = document.querySelectorAll('#eventsPart4Container > div');
+                part4Containers.forEach(eventDiv => {
+                    const summaryElement = eventDiv.querySelector('textarea[name="eventSummary4"]');
+                    const triggerElement = eventDiv.querySelector('textarea[name="trigger4"]');
+                    const startTimeElement = eventDiv.querySelector('input[name="startTime4"]');
+                    const endTimeElement = eventDiv.querySelector('input[name="endTime4"]');
+                    
+                    if (summaryElement || triggerElement) {
+                        const event = {
+                            event_summary: summaryElement ? summaryElement.value.trim() : '',
+                            trigger_info: triggerElement ? triggerElement.value.trim() : '',
+                            start_time: startTimeElement ? startTimeElement.value : '',
+                            end_time: endTimeElement ? endTimeElement.value : ''
+                        };
+                        
+                        if (event.event_summary || event.trigger) {
+                            eventsPart4.push(event);
+                        }
+                    }
+                });
+                
+                // Prepare form data
+                const formData = {
+                    report_date: reportDate,
+                    shift_hours_id: shiftHoursValue ? parseInt(shiftHoursValue) : null,
+                    shift_manager_ids: shiftManagerIds,
+                    event_title_ids: eventTitleIds,
+                    health_power_sources: healthPowerElement ? healthPowerElement.checked : false,
+                    health_humidity_temp: healthHumidityElement ? healthHumidityElement.checked : false,
+                    health_fire_system: healthFireElement ? healthFireElement.checked : false,
+                    events_part3: eventsPart3,
+                    events_part4: eventsPart4
+                };
+                
+                console.log('Form data prepared:', formData);
+                
+                // Validate JSON serialization
+                let jsonString;
+                try {
+                    jsonString = JSON.stringify(formData);
+                    console.log('JSON string:', jsonString);
+                } catch (jsonError) {
+                    console.error('JSON serialization error:', jsonError);
+                    showNotification('error', 'Error preparing data for submission');
+                    return;
+                }
+                
+                // Submit the form (POST for new, PUT for edit)
+                let url = '/api/reports';
+                let method = 'POST';
+                
+                if (editId) {
+                    url = `/api/reports/${editId}`;
+                    method = 'PUT';
+                }
+                
+                console.log(`Sending ${method} request to ${url}...`);
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: jsonString
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Success response:', result);
+                    showNotification('success', `Report ${editId ? 'updated' : 'submitted'} successfully! Redirecting...`);
+                    setTimeout(() => {
+                        window.location.href = '/static/reports-list.html';
+                    }, 2000);
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    showNotification('error', `Error ${editId ? 'updating' : 'submitting'} report: ` + errorText);
+                }
+                
+            } catch (error) {
+                console.error('Form submission error:', error);
+                showNotification('error', 'Connection error: ' + error.message);
+            }
+        });
+
+        async function logout() {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                showNotification('success', 'Logged out successfully');
+                setTimeout(() => {
+                    window.location.href = '/static/login.html';
+                }, 1000);
+            } catch (error) {
+                window.location.href = '/static/login.html';
+            }
+        }
+    </script>
+</body>
+</html>
