@@ -292,5 +292,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Note**: This application is designed for internal use and should be deployed in a secure environment. Always use strong passwords and keep the JWT secret secure in production environments.#   d a i l y - r e p o r t - g o  
+**Note**: This application is designed for internal use and should be deployed in a secure environment. Always use strong passwords and keep the JWT secret secure in production environments.#   d a i l y - r e p o r t - g o 
+ 
  
