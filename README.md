@@ -68,7 +68,7 @@ Go-event-web-22/
 │   └── ...                 # Other static assets
 └── ...                     # Other project files
 ```
-
+ 
 ## Installation
 
 1. **Prerequisites**:
