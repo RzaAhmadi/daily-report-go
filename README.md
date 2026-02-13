@@ -12,7 +12,7 @@ A comprehensive web application for managing daily reports, shift schedules, and
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
 - [API Endpoints](#api-endpoints)
-- [Frontend Pages](#frontend-pages)
+- [Frontend Pages](#frontend-pages)  
 - [Admin Panel](#admin-panel)
 - [Development](#development)
 - [Deployment](#deployment)
