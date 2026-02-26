@@ -20,7 +20,7 @@ func main() {
 	// Database connection
 	var err error
 	fmt.Println("Attempting to connect to database...")
-	db, err = sql.Open("postgres", "host=localhost port=5432 user=postgres password=1 dbname=daily_reports sslmode=disable")
+	db, err = sql.Open("postgres", "host=localhost port=5432 user=postgres password=password dbname=DB-Name sslmode=disable")
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
